@@ -1,25 +1,27 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
   Search,
-  Filter,
   Plus,
   Sun,
   Moon,
   X,
-  Globe,
-  Bot,
-  SlidersHorizontal,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
-import { cn } from "@/lib/utils";
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     projects,
@@ -29,10 +31,7 @@ export const Header: React.FC = () => {
     filters,
     setFilters,
     resetFilters,
-    theme,
-    toggleTheme,
     setIsCreateTaskOpen,
-    setIsCreateProjectOpen,
   } = useKanban();
 
   // Keyboard shortcut Ctrl/Cmd + K focus search
@@ -56,8 +55,6 @@ export const Header: React.FC = () => {
     title = "Сроки и дедлайны";
   }
 
-  const activeProject = projects.find((p) => p.id === activeProjectId);
-
   const hasActiveFilters =
     Boolean(filters.searchQuery) ||
     Boolean(filters.columnId) ||
@@ -67,8 +64,15 @@ export const Header: React.FC = () => {
     Boolean(filters.onlyOverdue) ||
     Boolean(filters.onlyBlocked);
 
+  const currentTheme = theme === "system" ? resolvedTheme : theme;
+  const isDark = currentTheme === "dark";
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/80 px-4 md:px-6 backdrop-blur-md border-border/60">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/90 px-4 md:px-6 backdrop-blur-md border-border/80">
       {/* Title & Project Selector */}
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-semibold tracking-tight text-foreground hidden sm:block">
@@ -77,7 +81,7 @@ export const Header: React.FC = () => {
 
         {/* Project Selector for /board */}
         {cleanPathname.startsWith("/board") && projects.length > 0 && (
-          <div className="flex items-center gap-2 bg-muted/50 border border-border/80 rounded-xl px-2.5 py-1">
+          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-2.5 py-1">
             <span className="text-xs font-mono text-muted-foreground hidden md:inline">
               Проект:
             </span>
@@ -138,9 +142,9 @@ export const Header: React.FC = () => {
         <button
           onClick={toggleTheme}
           className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          title={theme === "dark" ? "Переключить на светлую тему" : "Переключить на тёмную тему"}
+          title={mounted && isDark ? "Переключить на светлую тему" : "Переключить на тёмную тему"}
         >
-          {theme === "dark" ? (
+          {mounted && isDark ? (
             <Sun className="h-4 w-4 text-yellow-400" />
           ) : (
             <Moon className="h-4 w-4 text-slate-700" />
