@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -11,22 +10,19 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
-  Folder,
   Globe,
   Bot,
   RotateCcw,
-  Sparkles,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
-import { cn } from "@/lib/utils";
-
 import { Logo } from "@/components/ui/Logo";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   basePath?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
+export const Sidebar: React.FC<SidebarProps> = () => {
   const pathname = usePathname();
   const {
     projects,
@@ -34,9 +30,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
     setActiveProjectId,
     setIsCreateProjectOpen,
     resetDemoData,
+    isSidebarCollapsed,
+    setIsSidebarCollapsed,
+    toggleSidebar,
   } = useKanban();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navItems = [
@@ -75,55 +73,63 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r bg-card transition-all duration-300 border-border/80",
-          isCollapsed ? "w-[72px]" : "w-[260px]",
+          "fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r bg-card transition-all duration-300 ease-in-out border-border",
+          isSidebarCollapsed ? "w-[72px]" : "w-[260px]",
           isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Header / Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border/60">
-          <Link
-            href="/"
-            className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90"
-          >
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple">
-              <Logo className="h-full w-full" />
+        {/* Header / Logo Bar */}
+        <div className="flex h-16 items-center px-4 border-b border-border">
+          {isSidebarCollapsed ? (
+            /* Collapsed mode: Centered Logo + Expand Button toggle */
+            <div className="flex w-full items-center justify-between">
+              <button
+                onClick={toggleSidebar}
+                className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple hover:bg-ssj-purple/20 transition-all mx-auto"
+                title="Развернуть меню"
+              >
+                <Logo className="h-full w-full" />
+              </button>
             </div>
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-semibold tracking-tight text-foreground text-sm flex items-center gap-1.5">
-                  SSJKanban
-                  <span className="rounded bg-ssj-purple/20 px-1.5 py-0.5 text-[10px] font-mono text-ssj-purple font-medium">
-                    MVP
+          ) : (
+            /* Expanded mode: Logo + Title + Collapse Button */
+            <div className="flex w-full items-center justify-between gap-2 overflow-hidden">
+              <Link
+                href="/"
+                className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90 min-w-0"
+              >
+                <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple">
+                  <Logo className="h-full w-full" />
+                </div>
+                <div className="flex flex-col truncate">
+                  <span className="font-bold tracking-tight text-foreground text-sm flex items-center gap-1.5">
+                    SSJKanban
+                    <span className="rounded bg-ssj-purple/20 px-1.5 py-0.5 text-[10px] font-mono text-ssj-purple font-semibold">
+                      MVP
+                    </span>
                   </span>
-                </span>
-                <span className="text-[11px] text-muted-foreground font-mono">
-                  SSJCorp Team
-                </span>
-              </div>
-            )}
-          </Link>
+                  <span className="text-[11px] text-muted-foreground font-mono">
+                    SSJCorp Team
+                  </span>
+                </div>
+              </Link>
 
-          {/* Desktop Collapse Toggle */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            title={isCollapsed ? "Развернуть панель" : "Свернуть панель"}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </button>
+              <button
+                onClick={toggleSidebar}
+                className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title="Свернуть панель"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Navigation Links */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              // Handle basePath matching for production GitHub Pages
               const cleanPathname = pathname.replace(/^\/kanban-front/, "") || "/";
               const isActive =
                 cleanPathname === item.href ||
@@ -135,15 +141,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
                   href={item.href}
                   onClick={() => setIsMobileOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                    "flex items-center gap-3 rounded-xl p-2 text-sm font-medium transition-all group",
                     isActive
-                      ? "bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30 shadow-sm"
+                      ? "bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30 shadow-xs"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   )}
-                  title={isCollapsed ? item.label : undefined}
+                  title={isSidebarCollapsed ? item.label : undefined}
                 >
-                  <Icon className={cn("h-4 w-4 shrink-0", isActive && "text-ssj-purple")} />
-                  {!isCollapsed && <span>{item.label}</span>}
+                  <div
+                    className={cn(
+                      "h-9 w-9 shrink-0 aspect-square rounded-xl flex items-center justify-center transition-colors",
+                      isActive
+                        ? "bg-ssj-purple text-white shadow-md shadow-ssj-purple/30"
+                        : "bg-muted/50 text-muted-foreground group-hover:text-foreground group-hover:bg-muted"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <span className="truncate font-semibold">{item.label}</span>
+                  )}
                 </Link>
               );
             })}
@@ -151,8 +168,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
 
           {/* Projects List */}
           <div className="space-y-2">
-            {!isCollapsed && (
-              <div className="flex items-center justify-between px-3">
+            {!isSidebarCollapsed && (
+              <div className="flex items-center justify-between px-2">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
                   Проекты ({projects.length})
                 </span>
@@ -179,18 +196,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
                     href={`/board/?project=${project.slug}`}
                     onClick={() => handleProjectClick(project.id)}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all group",
+                      "flex items-center gap-3 rounded-xl p-2 text-sm transition-all group",
                       isSelected
-                        ? "bg-muted text-foreground font-medium border border-border"
+                        ? "bg-muted text-foreground font-semibold border border-border"
                         : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
                     )}
-                    title={isCollapsed ? project.name : undefined}
+                    title={isSidebarCollapsed ? project.name : undefined}
                   >
-                    <TypeIcon className={cn("h-4 w-4 shrink-0", accentColor)} />
-                    {!isCollapsed && (
-                      <span className="truncate flex-1">{project.name}</span>
+                    <div
+                      className={cn(
+                        "h-9 w-9 shrink-0 aspect-square rounded-xl flex items-center justify-center bg-muted/40 border border-border/50",
+                        accentColor
+                      )}
+                    >
+                      <TypeIcon className="h-4 w-4" />
+                    </div>
+                    {!isSidebarCollapsed && (
+                      <span className="truncate flex-1 font-medium">{project.name}</span>
                     )}
-                    {!isCollapsed && isSelected && (
+                    {!isSidebarCollapsed && isSelected && (
                       <div className="h-1.5 w-1.5 rounded-full bg-ssj-purple animate-pulse" />
                     )}
                   </Link>
@@ -201,8 +225,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-3 border-t border-border/60 space-y-2">
-          {!isCollapsed && (
+        <div className="p-3 border-t border-border space-y-2">
+          {isSidebarCollapsed ? (
+            <button
+              onClick={toggleSidebar}
+              className="flex w-full items-center justify-center h-9 rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Развернуть меню"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
             <button
               onClick={() => {
                 if (confirm("Сбросить демо-данные к первоначальному состоянию?")) {

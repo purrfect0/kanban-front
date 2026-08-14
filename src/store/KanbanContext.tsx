@@ -33,6 +33,9 @@ interface KanbanContextType {
   theme: "dark" | "light";
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
   isLoading: boolean;
 
   // Actions
@@ -64,7 +67,12 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => !prev);
+  };
 
   // Sync active project to localStorage
   const setActiveProjectId = useCallback((id: string | null) => {
@@ -281,6 +289,9 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         theme,
         setTheme,
         toggleTheme,
+        isSidebarCollapsed,
+        setIsSidebarCollapsed,
+        toggleSidebar,
         isLoading,
         refreshData,
         createTask: handleCreateTask,
