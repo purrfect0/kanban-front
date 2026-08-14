@@ -69,7 +69,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
     <div
       ref={setNodeRef}
       className={cn(
-        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/90 dark:bg-[#0D0D10] p-3 transition-all duration-200 h-full max-h-full shadow-sm",
+        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/90 dark:bg-[#0D0D10] p-3 transition-all duration-200 h-fit shadow-sm",
         isCollapsed ? "w-16" : "w-[300px] sm:w-[320px]",
         isOver && columnTheme.drop
       )}
@@ -77,8 +77,8 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
       {/* Status Top Accent Line */}
       <div className={cn("absolute top-0 left-4 right-4 h-[2px] rounded-full", columnTheme.line)} />
 
-      {/* Column Header */}
-      <div className="flex items-center justify-between pb-3 pt-1 px-1 bg-slate-100/95 dark:bg-[#0D0D10]/95 border-b border-border/40 shrink-0">
+      {/* Sticky Column Header */}
+      <div className="sticky top-16 z-10 flex items-center justify-between pb-3 pt-1 px-1 bg-slate-100/95 dark:bg-[#0D0D10]/95 backdrop-blur border-b border-border/40 shrink-0">
         <div className="flex items-center gap-2 overflow-hidden">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -154,7 +154,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
           items={tasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex-1 min-h-0 space-y-3 overflow-y-auto pt-3 pr-1">
+          <div className="space-y-3 pt-3 pr-1">
             {tasks.map((task, idx) => (
               <BlurFade key={task.id} delay={0.05 + idx * 0.03}>
                 <TaskCard task={task} members={members} />

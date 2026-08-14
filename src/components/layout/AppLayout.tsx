@@ -33,7 +33,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-slate-50 dark:bg-[#050505] text-foreground flex antialiased overflow-x-hidden">
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#050505] text-foreground flex antialiased">
       {/* Level 0 Background Tech Pattern & Soft Purple Radial Glows */}
       <DotPattern className="opacity-[0.07] pointer-events-none fixed inset-0 z-0" />
       <div className="fixed top-0 left-1/4 -z-10 h-[500px] w-[500px] rounded-full bg-ssj-purple/10 blur-[140px] pointer-events-none" />
@@ -50,7 +50,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         )}
       >
         <Header onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
-        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden">
+        <main className="flex-1 p-3 sm:p-4 md:p-6">
           {children}
         </main>
       </div>
