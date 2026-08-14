@@ -14,6 +14,7 @@ import {
   Bot,
   RotateCcw,
   X,
+  UserCheck,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
 import { Logo } from "@/components/ui/Logo";
@@ -48,6 +49,11 @@ export const Sidebar: React.FC = () => {
       label: "Сроки",
       href: "/deadlines/",
       icon: CalendarDays,
+    },
+    {
+      label: "Мои задачи",
+      href: "/my-tasks/",
+      icon: UserCheck,
     },
   ];
 

@@ -11,10 +11,13 @@ import {
   Clock,
   Ban,
   Save,
+  Lock,
+  History as HistoryIcon,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
-import { Priority, Label, ChecklistItem } from "@/types/kanban";
-import { getTaskDeadlineStatus } from "@/lib/repositories/KanbanRepository";
+import { Priority, Label, ChecklistItem, Task } from "@/types/kanban";
+import { isTaskOverdue, hasCyclicDependency } from "@/lib/utils/taskUtils";
+import { formatDateFull, formatDateRelative } from "@/lib/utils/dateUtils";
 import { cn } from "@/lib/utils";
 
 const AVAILABLE_LABELS: Label[] = [
@@ -33,8 +36,10 @@ export const TaskDetailSheet: React.FC = () => {
     columns,
     members,
     projects,
+    tasks,
     updateTask,
     deleteTask,
+    showToast,
   } = useKanban();
 
   const [title, setTitle] = useState("");
@@ -49,6 +54,7 @@ export const TaskDetailSheet: React.FC = () => {
   const [newChecklistText, setNewChecklistText] = useState("");
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockedReason, setBlockedReason] = useState("");
+  const [dependencyIds, setDependencyIds] = useState<string[]>([]);
   const [isDirty, setIsDirty] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -66,12 +72,13 @@ export const TaskDetailSheet: React.FC = () => {
       setChecklist(selectedTask.checklist || []);
       setIsBlocked(selectedTask.isBlocked || false);
       setBlockedReason(selectedTask.blockedReason || "");
+      setDependencyIds(selectedTask.dependencyIds || []);
       setIsDirty(false);
       setShowDeleteConfirm(false);
     }
   }, [selectedTask]);
 
-  // Handle Escape key close with dirty check
+  // Handle Escape key close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && selectedTask) {
@@ -114,8 +121,15 @@ export const TaskDetailSheet: React.FC = () => {
         checklist,
         isBlocked,
         blockedReason: isBlocked ? blockedReason.trim() : undefined,
+        dependencyIds,
       });
       setIsDirty(false);
+      showToast({
+        id: `toast-${Date.now()}`,
+        type: "success",
+        title: "Изменения сохранены",
+        description: selectedTask.id,
+      });
     } catch (err) {
       console.error("Failed to update task:", err);
     }
@@ -156,20 +170,38 @@ export const TaskDetailSheet: React.FC = () => {
     setIsDirty(true);
   };
 
-  const deadlineStatus = getTaskDeadlineStatus(dueDate);
+  const toggleDependency = (depId: string) => {
+    if (hasCyclicDependency(selectedTask.id, depId, tasks)) {
+      alert("Невозможно добавить зависимость: возникнет циклическая связь!");
+      return;
+    }
+
+    if (dependencyIds.includes(depId)) {
+      setDependencyIds(dependencyIds.filter((id) => id !== depId));
+    } else {
+      setDependencyIds([...dependencyIds, depId]);
+    }
+    setIsDirty(true);
+  };
+
+  const isOverdue = isTaskOverdue(selectedTask);
   const completedChecklistCount = checklist.filter((item) => item.completed).length;
 
+  const availableDepTasks = tasks.filter(
+    (t) => t.id !== selectedTask.id && t.projectId === selectedTask.projectId
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-      <div className="relative flex h-full w-full max-w-2xl flex-col border-l border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0F0F10] text-slate-900 dark:text-slate-100 shadow-2xl animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-md animate-blur-fade">
+      <div className="relative flex h-full w-full max-w-2xl flex-col border-l border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0F0F10] text-slate-900 dark:text-slate-100 shadow-2xl overflow-y-auto">
         {/* Top Sticky Bar */}
         <div className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-[#0F0F10]/95 px-6 backdrop-blur">
           <div className="flex items-center gap-3">
-            <span className="rounded-lg bg-ssj-purple/15 px-2.5 py-1 font-mono text-xs font-semibold text-ssj-purple border border-ssj-purple/30">
+            <span className="rounded-lg bg-ssj-purple/15 px-2.5 py-1 font-mono text-xs font-bold text-ssj-purple border border-ssj-purple/30">
               {selectedTask.id}
             </span>
             {project && (
-              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400">
+              <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">
                 {project.name}
               </span>
             )}
@@ -177,14 +209,14 @@ export const TaskDetailSheet: React.FC = () => {
 
           <div className="flex items-center gap-2">
             {isDirty && (
-              <span className="text-xs text-amber-500 font-medium animate-pulse mr-2">
+              <span className="text-xs text-amber-500 font-semibold animate-pulse mr-2 font-mono">
                 ● Есть несохранённые изменения
               </span>
             )}
 
             <button
               onClick={handleSave}
-              className="flex items-center gap-1.5 rounded-xl bg-ssj-purple px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-ssj-purple/90 transition-all"
+              className="flex items-center gap-1.5 rounded-xl bg-ssj-purple px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-ssj-purple/90 transition-all"
             >
               <Save className="h-3.5 w-3.5" />
               <span>Сохранить</span>
@@ -214,8 +246,8 @@ export const TaskDetailSheet: React.FC = () => {
             <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-destructive flex items-start gap-3">
               <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
               <div className="space-y-1 text-xs">
-                <span className="font-semibold text-sm">Задача заблокирована!</span>
-                <p className="text-destructive/90">{blockedReason || "Причина блокировки не указана."}</p>
+                <span className="font-bold text-sm">Задача заблокирована!</span>
+                <p className="text-destructive/90">{blockedReason || "Причина не указана."}</p>
               </div>
             </div>
           )}
@@ -238,7 +270,7 @@ export const TaskDetailSheet: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] p-4">
             {/* Column */}
             <div>
-              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 block mb-1">
                 Колонка
               </label>
               <select
@@ -247,7 +279,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setColumnId(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
+                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 font-semibold outline-none focus:border-ssj-purple transition-all"
               >
                 {columns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -259,7 +291,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Priority */}
             <div>
-              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 block mb-1">
                 Приоритет
               </label>
               <select
@@ -268,7 +300,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setPriority(e.target.value as Priority);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
+                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 font-semibold outline-none focus:border-ssj-purple transition-all"
               >
                 <option value="P0">P0 — Критический</option>
                 <option value="P1">P1 — Высокий</option>
@@ -279,7 +311,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Due Date */}
             <div>
-              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 block mb-1">
                 Срок выполнения
               </label>
               <div className="flex items-center gap-2">
@@ -290,22 +322,16 @@ export const TaskDetailSheet: React.FC = () => {
                     setDueDate(e.target.value);
                     setIsDirty(true);
                   }}
-                  className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
+                  className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 font-mono outline-none focus:border-ssj-purple transition-all"
                 />
                 {dueDate && (
                   <span
                     className={cn(
-                      "shrink-0 rounded-lg px-2 py-1 font-mono text-[10px] font-medium border",
-                      deadlineStatus === "overdue" && "bg-destructive/20 text-destructive border-destructive/40",
-                      deadlineStatus === "today" && "bg-amber-500/20 text-amber-500 border-amber-500/40",
-                      deadlineStatus === "due_soon" && "bg-blue-500/20 text-blue-500 border-blue-500/40",
-                      deadlineStatus === "normal" && "bg-ssj-web/20 text-ssj-web border-ssj-web/40"
+                      "shrink-0 rounded-lg px-2 py-1 font-mono text-[10px] font-bold border",
+                      isOverdue && "bg-destructive/20 text-destructive border-destructive/40"
                     )}
                   >
-                    {deadlineStatus === "overdue" && "Просрочено"}
-                    {deadlineStatus === "today" && "Сегодня"}
-                    {deadlineStatus === "due_soon" && "Скоро"}
-                    {deadlineStatus === "normal" && "В норме"}
+                    {formatDateRelative(dueDate)}
                   </span>
                 )}
               </div>
@@ -313,7 +339,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Time Estimate */}
             <div>
-              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 block mb-1">
                 Оценка времени
               </label>
               <input
@@ -331,7 +357,7 @@ export const TaskDetailSheet: React.FC = () => {
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
+            <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
               Описание
             </label>
             <textarea
@@ -346,33 +372,29 @@ export const TaskDetailSheet: React.FC = () => {
             />
           </div>
 
-          {/* Labels */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
-              Метки
+          {/* Task Dependencies */}
+          <div className="space-y-2.5 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] p-4">
+            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-2">
+              <Lock className="h-3.5 w-3.5 text-ssj-purple" />
+              Зависимости (Заблокирована задачами)
             </label>
+
             <div className="flex flex-wrap gap-2">
-              {AVAILABLE_LABELS.map((label) => {
-                const isSelected = selectedLabels.some((l) => l.id === label.id);
+              {availableDepTasks.map((depTask) => {
+                const isDepSelected = dependencyIds.includes(depTask.id);
                 return (
                   <button
-                    key={label.id}
+                    key={depTask.id}
                     type="button"
-                    onClick={() => {
-                      if (isSelected) {
-                        setSelectedLabels(selectedLabels.filter((l) => l.id !== label.id));
-                      } else {
-                        setSelectedLabels([...selectedLabels, label]);
-                      }
-                      setIsDirty(true);
-                    }}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
-                      isSelected
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
-                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
+                    onClick={() => toggleDependency(depTask.id)}
+                    className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-medium border transition-all ${
+                      isDepSelected
+                        ? "bg-amber-500/20 text-amber-500 border-amber-500/50 font-bold"
+                        : "border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] text-slate-700 dark:text-zinc-300"
                     }`}
                   >
-                    {label.name}
+                    <span className="font-mono text-[11px]">{depTask.id}</span>
+                    <span className="truncate max-w-[120px]">{depTask.title}</span>
                   </button>
                 );
               })}
@@ -381,7 +403,7 @@ export const TaskDetailSheet: React.FC = () => {
 
           {/* Assignees */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
+            <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
               Исполнители
             </label>
             <div className="flex flex-wrap gap-2">
@@ -401,8 +423,8 @@ export const TaskDetailSheet: React.FC = () => {
                     }}
                     className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-medium border transition-all ${
                       isAssigned
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
-                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-bold"
+                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300"
                     }`}
                   >
                     <span className="font-mono text-[11px]">{member.avatar}</span>
@@ -416,7 +438,7 @@ export const TaskDetailSheet: React.FC = () => {
           {/* Checklist */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
                 Чек-лист ({completedChecklistCount}/{checklist.length})
               </label>
               {checklist.length > 0 && (
@@ -485,7 +507,7 @@ export const TaskDetailSheet: React.FC = () => {
               <button
                 type="button"
                 onClick={addChecklistItem}
-                className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-700 flex items-center gap-1"
+                className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-700 flex items-center gap-1"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Добавить</span>
@@ -493,12 +515,35 @@ export const TaskDetailSheet: React.FC = () => {
             </div>
           </div>
 
+          {/* Event History Log */}
+          {selectedTask.history && selectedTask.history.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
+                <HistoryIcon className="h-3.5 w-3.5 text-ssj-purple" />
+                История изменений ({selectedTask.history.length})
+              </label>
+
+              <div className="space-y-2 max-h-48 overflow-y-auto rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50/60 dark:bg-[#141416] p-3 text-xs">
+                {selectedTask.history.slice().reverse().map((ev) => (
+                  <div key={ev.id} className="flex items-start justify-between gap-2 border-b border-border/40 pb-1.5 last:border-0">
+                    <div className="space-y-0.5">
+                      <span className="font-semibold text-foreground">{ev.details}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">
+                      {formatDateFull(ev.timestamp)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Blocked Flag Options */}
           <div className="rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-2">
                 <Ban className="h-4 w-4 text-destructive" />
-                Заблокировать задачу
+                Заблокировать задачу вручную
               </span>
               <input
                 type="checkbox"
@@ -534,18 +579,18 @@ export const TaskDetailSheet: React.FC = () => {
                 Удалить задачу {selectedTask.id}?
               </h3>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
-                Это действие нельзя отменить. Задача будет безвозвратно удалена из доски.
+                Это действие нельзя отменить. Задача будет удалена.
               </p>
               <div className="flex justify-center gap-3 pt-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="rounded-xl px-4 py-2 text-xs font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-destructive/90"
+                  className="rounded-xl bg-destructive px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-destructive/90"
                 >
                   Да, удалить
                 </button>

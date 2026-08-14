@@ -8,6 +8,8 @@ import {
   Member,
   FilterState,
   Priority,
+  ProjectStats,
+  ToastMessage,
 } from "@/types/kanban";
 import { kanbanRepository } from "@/lib/repositories/LocalStorageKanbanRepository";
 import { getTaskDeadlineStatus } from "@/lib/repositories/KanbanRepository";
@@ -39,6 +41,9 @@ interface KanbanContextType {
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
   toggleMobileSidebar: () => void;
+  toast: ToastMessage | null;
+  showToast: (msg: ToastMessage) => void;
+  dismissToast: () => void;
   isLoading: boolean;
 
   // Actions
@@ -245,22 +250,74 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return updated;
   };
 
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+
+  const showToast = useCallback((msg: ToastMessage) => {
+    setToast(msg);
+  }, []);
+
+  const dismissToast = useCallback(() => {
+    setToast(null);
+  }, []);
+
   const handleMoveTask = async (taskId: string, targetColumnId: string, targetIndex?: number) => {
+    const existingTask = tasks.find((t) => t.id === taskId);
+    if (!existingTask) return kanbanRepository.moveTask(taskId, targetColumnId, targetIndex);
+
+    const prevColId = existingTask.columnId;
+
     // Optimistic UI update
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, columnId: targetColumnId } : t))
     );
+
     const moved = await kanbanRepository.moveTask(taskId, targetColumnId, targetIndex);
     await refreshData();
+
+    if (prevColId !== targetColumnId) {
+      const targetCol = columns.find((c) => c.id === targetColumnId);
+      showToast({
+        id: `toast-${Date.now()}`,
+        type: "info",
+        title: `Задача ${taskId} перемещена`,
+        description: `Статус: ${targetCol?.title || targetColumnId}`,
+        action: {
+          label: "Отменить",
+          onClick: async () => {
+            await kanbanRepository.moveTask(taskId, prevColId);
+            await refreshData();
+          },
+        },
+      });
+    }
+
     return moved;
   };
 
   const handleDeleteTask = async (id: string) => {
+    const taskToDelete = tasks.find((t) => t.id === id);
     await kanbanRepository.deleteTask(id);
     if (selectedTask?.id === id) {
       setSelectedTask(null);
     }
     await refreshData();
+
+    if (taskToDelete) {
+      showToast({
+        id: `toast-${Date.now()}`,
+        type: "warning",
+        title: `Задача ${id} удалена`,
+        description: taskToDelete.title,
+        action: {
+          label: "Отменить",
+          onClick: async () => {
+            const { id: _, createdAt: __, updatedAt: ___, ...taskData } = taskToDelete;
+            await kanbanRepository.createTask(taskData);
+            await refreshData();
+          },
+        },
+      });
+    }
   };
 
   const handleCreateProject = async (
@@ -320,6 +377,9 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isMobileOpen,
         setIsMobileOpen,
         toggleMobileSidebar,
+        toast,
+        showToast,
+        dismissToast,
         isLoading,
         refreshData,
         createTask: handleCreateTask,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
@@ -13,10 +13,13 @@ import {
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onOpenCommandPalette?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onOpenCommandPalette }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -30,23 +33,10 @@ export const Header: React.FC = () => {
     activeProjectId,
     setActiveProjectId,
     filters,
-    setFilters,
     resetFilters,
     setIsCreateTaskOpen,
     toggleMobileSidebar,
   } = useKanban();
-
-  // Keyboard shortcut Ctrl/Cmd + K focus search
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   const cleanPathname = pathname.replace(/^\/kanban-front/, "") || "/";
 
@@ -55,6 +45,8 @@ export const Header: React.FC = () => {
     title = "Канбан";
   } else if (cleanPathname.startsWith("/deadlines")) {
     title = "Сроки";
+  } else if (cleanPathname.startsWith("/my-tasks")) {
+    title = "Мои задачи";
   }
 
   const hasActiveFilters =
@@ -74,7 +66,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/90 px-3 md:px-6 backdrop-blur-md border-border/80 gap-2">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/90 px-3 md:px-6 backdrop-blur-md border-border/60 gap-2 shadow-xs">
       {/* Left Area: Mobile Menu Toggle + Page Title + Project Selector */}
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         {/* Mobile Hamburger Button */}
@@ -86,13 +78,13 @@ export const Header: React.FC = () => {
           <Menu className="h-5 w-5" />
         </button>
 
-        <h1 className="text-sm sm:text-lg font-bold tracking-tight text-foreground truncate">
+        <h1 className="text-sm sm:text-base font-bold tracking-tight text-foreground truncate">
           {title}
         </h1>
 
         {/* Project Selector for /board */}
         {cleanPathname.startsWith("/board") && projects.length > 0 && (
-          <div className="flex items-center gap-1.5 bg-muted/50 border border-border rounded-xl px-2 py-1 max-w-[130px] sm:max-w-none truncate">
+          <div className="flex items-center gap-1.5 bg-muted/50 border border-border/80 rounded-xl px-2.5 py-1 max-w-[130px] sm:max-w-none truncate">
             <span className="text-xs font-mono text-muted-foreground hidden md:inline">
               Проект:
             </span>
@@ -105,7 +97,7 @@ export const Header: React.FC = () => {
                   router.push(`/board/?project=${proj.slug}`);
                 }
               }}
-              className="bg-transparent text-xs sm:text-sm font-medium text-foreground outline-none cursor-pointer truncate"
+              className="bg-transparent text-xs sm:text-sm font-semibold text-foreground outline-none cursor-pointer truncate"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -119,23 +111,17 @@ export const Header: React.FC = () => {
 
       {/* Right Controls Area */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        {/* Search Input (desktop/tablet) */}
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Поиск задач, ID, меток..."
-            value={filters.searchQuery}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
-            }
-            className="h-9 w-48 lg:w-64 rounded-xl border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ssj-purple focus:outline-none focus:ring-1 focus:ring-ssj-purple transition-all"
-          />
-          <kbd className="absolute right-2.5 flex h-5 select-none items-center gap-1 rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+        {/* Search Command Palette Trigger Button */}
+        <button
+          onClick={onOpenCommandPalette}
+          className="flex h-9 items-center gap-2 rounded-xl border border-border/80 bg-background px-3 text-xs text-muted-foreground hover:border-ssj-purple/50 hover:text-foreground transition-all"
+        >
+          <Search className="h-4 w-4" />
+          <span className="hidden sm:inline font-medium">Поиск и команды...</span>
+          <kbd className="flex h-5 select-none items-center gap-0.5 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-bold text-muted-foreground">
             ⌘K
           </kbd>
-        </div>
+        </button>
 
         {/* Filters Badge / Clear button if active */}
         {hasActiveFilters && (
@@ -178,7 +164,7 @@ export const Header: React.FC = () => {
         {/* Primary CTA button: New Task */}
         <button
           onClick={() => setIsCreateTaskOpen(true)}
-          className="relative inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-ssj-purple px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-md shadow-ssj-purple/20 hover:bg-ssj-purple/90 active:scale-95 transition-all shrink-0"
+          className="relative inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-ssj-purple px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-md shadow-ssj-purple/25 hover:bg-ssj-purple/90 active:scale-95 transition-all shrink-0"
         >
           <Plus className="h-4 w-4" />
           <span className="hidden xs:inline">Новая задача</span>
