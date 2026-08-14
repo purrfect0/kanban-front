@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import {
   Globe,
   Bot,
   RotateCcw,
+  X,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
 import { Logo } from "@/components/ui/Logo";
@@ -28,9 +29,9 @@ export const Sidebar: React.FC = () => {
     resetDemoData,
     isSidebarCollapsed,
     toggleSidebar,
+    isMobileOpen,
+    setIsMobileOpen,
   } = useKanban();
-
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navItems = [
     {
@@ -55,12 +56,16 @@ export const Sidebar: React.FC = () => {
     setIsMobileOpen(false);
   };
 
+  const handleNavClick = () => {
+    setIsMobileOpen(false);
+  };
+
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -68,56 +73,93 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r bg-card transition-all duration-300 ease-in-out border-border shadow-xs",
-          isSidebarCollapsed ? "w-[72px]" : "w-[260px]",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "fixed top-0 bottom-0 left-0 flex flex-col border-r bg-card transition-all duration-300 ease-in-out border-border shadow-2xl lg:shadow-none",
+          isMobileOpen
+            ? "z-50 w-[260px] translate-x-0"
+            : "z-40 -translate-x-full lg:translate-x-0",
+          !isMobileOpen && (isSidebarCollapsed ? "lg:w-[72px]" : "lg:w-[260px]")
         )}
       >
         {/* Header / Logo Bar */}
         <div className="flex h-16 items-center px-4 border-b border-border">
-          {isSidebarCollapsed ? (
-            /* Collapsed mode: Centered Logo box that expands on click */
-            <div className="flex w-full items-center justify-center">
-              <button
-                onClick={toggleSidebar}
-                className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple hover:bg-ssj-purple/25 transition-all shadow-xs"
-                title="Развернуть боковое меню"
-              >
+          {/* Mobile Drawer Header with Close Button */}
+          <div className="flex w-full items-center justify-between gap-2 lg:hidden">
+            <Link
+              href="/"
+              onClick={handleNavClick}
+              className="flex items-center gap-3 overflow-hidden"
+            >
+              <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple shadow-xs">
                 <Logo className="h-full w-full object-contain" />
-              </button>
-            </div>
-          ) : (
-            /* Expanded mode: Logo + Title + Collapse Arrow Button */
-            <div className="flex w-full items-center justify-between gap-2 overflow-hidden">
-              <Link
-                href="/"
-                className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90 min-w-0"
-              >
-                <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple shadow-xs">
-                  <Logo className="h-full w-full object-contain" />
-                </div>
-                <div className="flex flex-col truncate">
-                  <span className="font-bold tracking-tight text-foreground text-sm flex items-center gap-1.5">
-                    SSJKanban
-                    <span className="rounded bg-ssj-purple/20 px-1.5 py-0.5 text-[10px] font-mono text-ssj-purple font-semibold">
-                      MVP
-                    </span>
+              </div>
+              <div className="flex flex-col truncate">
+                <span className="font-bold tracking-tight text-foreground text-sm flex items-center gap-1.5">
+                  SSJKanban
+                  <span className="rounded bg-ssj-purple/20 px-1.5 py-0.5 text-[10px] font-mono text-ssj-purple font-semibold">
+                    MVP
                   </span>
-                  <span className="text-[11px] text-muted-foreground font-mono">
-                    SSJCorp Team
-                  </span>
-                </div>
-              </Link>
+                </span>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  SSJCorp Team
+                </span>
+              </div>
+            </Link>
 
-              <button
-                onClick={toggleSidebar}
-                className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                title="Свернуть панель"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+            <button
+              onClick={() => setIsMobileOpen(false)}
+              className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Закрыть меню"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Desktop Sidebar Header */}
+          <div className="hidden lg:flex w-full items-center justify-between">
+            {isSidebarCollapsed ? (
+              /* Collapsed mode: Centered Logo box that expands on click */
+              <div className="flex w-full items-center justify-center">
+                <button
+                  onClick={toggleSidebar}
+                  className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple hover:bg-ssj-purple/25 transition-all shadow-xs"
+                  title="Развернуть боковое меню"
+                >
+                  <Logo className="h-full w-full object-contain" />
+                </button>
+              </div>
+            ) : (
+              /* Expanded mode: Logo + Title + Collapse Arrow Button */
+              <div className="flex w-full items-center justify-between gap-2 overflow-hidden">
+                <Link
+                  href="/"
+                  className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90 min-w-0"
+                >
+                  <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple shadow-xs">
+                    <Logo className="h-full w-full object-contain" />
+                  </div>
+                  <div className="flex flex-col truncate">
+                    <span className="font-bold tracking-tight text-foreground text-sm flex items-center gap-1.5">
+                      SSJKanban
+                      <span className="rounded bg-ssj-purple/20 px-1.5 py-0.5 text-[10px] font-mono text-ssj-purple font-semibold">
+                        MVP
+                      </span>
+                    </span>
+                    <span className="text-[11px] text-muted-foreground font-mono">
+                      SSJCorp Team
+                    </span>
+                  </div>
+                </Link>
+
+                <button
+                  onClick={toggleSidebar}
+                  className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Свернуть панель"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Navigation Links */}
@@ -130,13 +172,13 @@ export const Sidebar: React.FC = () => {
                 cleanPathname === item.href ||
                 (item.href !== "/" && cleanPathname.startsWith(item.href));
 
-              if (isSidebarCollapsed) {
-                // Collapsed: Single centered square icon button
+              // Collapsed mode (desktop only)
+              if (isSidebarCollapsed && !isMobileOpen) {
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setIsMobileOpen(false)}
+                    onClick={handleNavClick}
                     className={cn(
                       "flex h-10 w-10 mx-auto items-center justify-center rounded-xl border transition-all shadow-xs",
                       isActive
@@ -150,12 +192,12 @@ export const Sidebar: React.FC = () => {
                 );
               }
 
-              // Expanded: Clean row with icon + text label
+              // Expanded mode & Mobile Drawer
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsMobileOpen(false)}
+                  onClick={handleNavClick}
                   className={cn(
                     "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all border",
                     isActive
@@ -177,13 +219,16 @@ export const Sidebar: React.FC = () => {
 
           {/* Projects List */}
           <div className="space-y-2">
-            {!isSidebarCollapsed && (
+            {(!isSidebarCollapsed || isMobileOpen) && (
               <div className="flex items-center justify-between px-2">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
                   Проекты ({projects.length})
                 </span>
                 <button
-                  onClick={() => setIsCreateProjectOpen(true)}
+                  onClick={() => {
+                    setIsCreateProjectOpen(true);
+                    setIsMobileOpen(false);
+                  }}
                   className="h-6 w-6 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-ssj-purple/20 hover:text-ssj-purple transition-colors"
                   title="Создать новый проект"
                 >
@@ -197,7 +242,7 @@ export const Sidebar: React.FC = () => {
                 const isSelected = activeProjectId === project.id;
                 const TypeIcon = project.type === "website" ? Globe : Bot;
 
-                if (isSidebarCollapsed) {
+                if (isSidebarCollapsed && !isMobileOpen) {
                   return (
                     <Link
                       key={project.id}
@@ -247,7 +292,7 @@ export const Sidebar: React.FC = () => {
 
         {/* Footer Actions */}
         <div className="p-3 border-t border-border space-y-2">
-          {isSidebarCollapsed ? (
+          {isSidebarCollapsed && !isMobileOpen ? (
             <button
               onClick={toggleSidebar}
               className="flex h-10 w-10 mx-auto items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
@@ -260,6 +305,7 @@ export const Sidebar: React.FC = () => {
               onClick={() => {
                 if (confirm("Сбросить демо-данные к первоначальному состоянию?")) {
                   resetDemoData();
+                  setIsMobileOpen(false);
                 }
               }}
               className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"

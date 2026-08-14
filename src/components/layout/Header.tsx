@@ -9,6 +9,7 @@ import {
   Sun,
   Moon,
   X,
+  Menu,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
 
@@ -32,6 +33,7 @@ export const Header: React.FC = () => {
     setFilters,
     resetFilters,
     setIsCreateTaskOpen,
+    toggleMobileSidebar,
   } = useKanban();
 
   // Keyboard shortcut Ctrl/Cmd + K focus search
@@ -48,11 +50,11 @@ export const Header: React.FC = () => {
 
   const cleanPathname = pathname.replace(/^\/kanban-front/, "") || "/";
 
-  let title = "Обзор проектов";
+  let title = "Обзор";
   if (cleanPathname.startsWith("/board")) {
-    title = "Канбан-доска";
+    title = "Канбан";
   } else if (cleanPathname.startsWith("/deadlines")) {
-    title = "Сроки и дедлайны";
+    title = "Сроки";
   }
 
   const hasActiveFilters =
@@ -72,16 +74,25 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/90 px-4 md:px-6 backdrop-blur-md border-border/80">
-      {/* Title & Project Selector */}
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold tracking-tight text-foreground hidden sm:block">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/90 px-3 md:px-6 backdrop-blur-md border-border/80 gap-2">
+      {/* Left Area: Mobile Menu Toggle + Page Title + Project Selector */}
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={toggleMobileSidebar}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-foreground hover:bg-muted transition-colors lg:hidden"
+          title="Открыть боковое меню"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        <h1 className="text-sm sm:text-lg font-bold tracking-tight text-foreground truncate">
           {title}
         </h1>
 
         {/* Project Selector for /board */}
         {cleanPathname.startsWith("/board") && projects.length > 0 && (
-          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-2.5 py-1">
+          <div className="flex items-center gap-1.5 bg-muted/50 border border-border rounded-xl px-2 py-1 max-w-[130px] sm:max-w-none truncate">
             <span className="text-xs font-mono text-muted-foreground hidden md:inline">
               Проект:
             </span>
@@ -94,11 +105,11 @@ export const Header: React.FC = () => {
                   router.push(`/board/?project=${proj.slug}`);
                 }
               }}
-              className="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer pr-1"
+              className="bg-transparent text-xs sm:text-sm font-medium text-foreground outline-none cursor-pointer truncate"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.type === "website" ? "Сайт" : "Бот"})
+                  {p.name}
                 </option>
               ))}
             </select>
@@ -107,8 +118,8 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Right Controls Area */}
-      <div className="flex items-center gap-3">
-        {/* Search Input */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Search Input (desktop/tablet) */}
         <div className="relative hidden md:flex items-center">
           <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
           <input
@@ -119,7 +130,7 @@ export const Header: React.FC = () => {
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
             }
-            className="h-9 w-64 rounded-xl border border-border bg-background pl-9 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus:border-ssj-purple focus:outline-none focus:ring-1 focus:ring-ssj-purple transition-all"
+            className="h-9 w-48 lg:w-64 rounded-xl border border-border bg-background pl-9 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-ssj-purple focus:outline-none focus:ring-1 focus:ring-ssj-purple transition-all"
           />
           <kbd className="absolute right-2.5 flex h-5 select-none items-center gap-1 rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
             ⌘K
@@ -141,7 +152,7 @@ export const Header: React.FC = () => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
           title={mounted && isDark ? "Переключить на светлую тему" : "Переключить на тёмную тему"}
         >
           {mounted && isDark ? (
@@ -151,7 +162,7 @@ export const Header: React.FC = () => {
           )}
         </button>
 
-        {/* Team Avatars */}
+        {/* Team Avatars (desktop) */}
         <div className="hidden lg:flex items-center gap-1.5 px-1">
           {members.slice(0, 3).map((member) => (
             <div
@@ -167,10 +178,11 @@ export const Header: React.FC = () => {
         {/* Primary CTA button: New Task */}
         <button
           onClick={() => setIsCreateTaskOpen(true)}
-          className="relative inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-ssj-purple px-4 text-xs md:text-sm font-medium text-white shadow-md shadow-ssj-purple/20 hover:bg-ssj-purple/90 active:scale-95 transition-all"
+          className="relative inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-ssj-purple px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-md shadow-ssj-purple/20 hover:bg-ssj-purple/90 active:scale-95 transition-all shrink-0"
         >
           <Plus className="h-4 w-4" />
-          <span>Новая задача</span>
+          <span className="hidden xs:inline">Новая задача</span>
+          <span className="xs:hidden">Задача</span>
         </button>
       </div>
     </header>

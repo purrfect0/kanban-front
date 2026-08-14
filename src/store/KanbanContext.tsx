@@ -36,6 +36,9 @@ interface KanbanContextType {
   isSidebarCollapsed: boolean;
   setIsSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (open: boolean) => void;
+  toggleMobileSidebar: () => void;
   isLoading: boolean;
 
   // Actions
@@ -68,7 +71,12 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [isSidebarCollapsed, setIsSidebarCollapsedState] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileOpen((prev) => !prev);
+  };
 
   // Load saved sidebar state
   useEffect(() => {
@@ -309,6 +317,9 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isSidebarCollapsed,
         setIsSidebarCollapsed,
         toggleSidebar,
+        isMobileOpen,
+        setIsMobileOpen,
+        toggleMobileSidebar,
         isLoading,
         refreshData,
         createTask: handleCreateTask,
