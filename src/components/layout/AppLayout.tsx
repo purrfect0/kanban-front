@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { KanbanProvider, useKanban } from "@/store/KanbanContext";
+import { useKanban } from "@/store/KanbanContext";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { CreateTaskModal } from "@/components/tasks/CreateTaskModal";
@@ -16,7 +16,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-function AppLayoutContent({ children }: AppLayoutProps) {
+export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { isSidebarCollapsed, toast, dismissToast } = useKanban();
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
@@ -65,13 +65,5 @@ function AppLayoutContent({ children }: AppLayoutProps) {
       />
       <ToastContainer toast={toast} onDismiss={dismissToast} />
     </div>
-  );
-}
-
-export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  return (
-    <KanbanProvider>
-      <AppLayoutContent>{children}</AppLayoutContent>
-    </KanbanProvider>
   );
 };

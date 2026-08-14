@@ -32,9 +32,6 @@ interface KanbanContextType {
   setIsCreateTaskOpen: (open: boolean) => void;
   isCreateProjectOpen: boolean;
   setIsCreateProjectOpen: (open: boolean) => void;
-  theme: "dark" | "light";
-  setTheme: (theme: "dark" | "light") => void;
-  toggleTheme: () => void;
   isSidebarCollapsed: boolean;
   setIsSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
@@ -74,7 +71,6 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
-  const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [isSidebarCollapsed, setIsSidebarCollapsedState] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -141,35 +137,6 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     refreshData();
   }, [refreshData]);
-
-  // Theme management
-  useEffect(() => {
-    const savedTheme = (localStorage.getItem("ssjcorp-kanban:theme-v3") as "dark" | "light" | null) || "dark";
-    setThemeState(savedTheme);
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const setTheme = (t: "dark" | "light") => {
-    setThemeState(t);
-    localStorage.setItem("ssjcorp-kanban:theme-v3", t);
-    if (t === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
@@ -368,9 +335,6 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setIsCreateTaskOpen,
         isCreateProjectOpen,
         setIsCreateProjectOpen,
-        theme,
-        setTheme,
-        toggleTheme,
         isSidebarCollapsed,
         setIsSidebarCollapsed,
         toggleSidebar,

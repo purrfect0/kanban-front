@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { KanbanProvider } from "@/store/KanbanContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,10 +33,12 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <KanbanProvider>
+            {children}
+          </KanbanProvider>
         </ThemeProvider>
       </body>
     </html>
