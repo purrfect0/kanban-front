@@ -79,12 +79,17 @@ export const TaskDetailSheet: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && selectedTask) {
-        handleClose();
+        if (isDirty) {
+          if (!confirm("У вас есть несохранённые изменения. Закрыть без сохранения?")) {
+            return;
+          }
+        }
+        setSelectedTask(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedTask, isDirty]);
+  }, [selectedTask, isDirty, setSelectedTask]);
 
   if (!selectedTask) return null;
 
