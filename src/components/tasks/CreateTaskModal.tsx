@@ -1,0 +1,306 @@
+"use client";
+
+import React, { useState } from "react";
+import { X, Plus, AlertCircle } from "lucide-react";
+import { useKanban } from "@/store/KanbanContext";
+import { Priority, Label } from "@/types/kanban";
+
+const AVAILABLE_LABELS: Label[] = [
+  { id: "l1", name: "Frontend", color: "#7C6CF6" },
+  { id: "l2", name: "UI/UX", color: "#22C55E" },
+  { id: "l3", name: "Performance", color: "#EAB308" },
+  { id: "l4", name: "SEO", color: "#06B6D4" },
+  { id: "l5", name: "API Integration", color: "#EC4899" },
+  { id: "l6", name: "Bot Logic", color: "#29A9EB" },
+];
+
+export const CreateTaskModal: React.FC = () => {
+  const {
+    isCreateTaskOpen,
+    setIsCreateTaskOpen,
+    projects,
+    activeProjectId,
+    columns,
+    members,
+    createTask,
+  } = useKanban();
+
+  const [projectId, setProjectId] = useState<string>(activeProjectId || projects[0]?.id || "");
+  const [columnId, setColumnId] = useState<string>("todo");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Priority>("P2");
+  const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<Label[]>([]);
+  const [dueDate, setDueDate] = useState("");
+  const [timeEstimate, setTimeEstimate] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  if (!isCreateTaskOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: { [key: string]: string } = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Название задачи обязательно";
+    }
+    if (!projectId) {
+      newErrors.projectId = "Выберите проект";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      await createTask({
+        projectId,
+        columnId,
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        labels: selectedLabels,
+        assigneeIds,
+        dueDate: dueDate || undefined,
+        timeEstimate: timeEstimate.trim() || undefined,
+        checklist: [],
+        isBlocked: false,
+      });
+
+      // Reset form
+      setTitle("");
+      setDescription("");
+      setPriority("P2");
+      setAssigneeIds([]);
+      setSelectedLabels([]);
+      setDueDate("");
+      setTimeEstimate("");
+      setErrors({});
+      setIsCreateTaskOpen(false);
+    } catch (err) {
+      console.error("Failed to create task:", err);
+    }
+  };
+
+  const toggleLabel = (label: Label) => {
+    if (selectedLabels.some((l) => l.id === label.id)) {
+      setSelectedLabels(selectedLabels.filter((l) => l.id !== label.id));
+    } else {
+      setSelectedLabels([...selectedLabels, label]);
+    }
+  };
+
+  const toggleAssignee = (memberId: string) => {
+    if (assigneeIds.includes(memberId)) {
+      setAssigneeIds(assigneeIds.filter((id) => id !== memberId));
+    } else {
+      setAssigneeIds([...assigneeIds, memberId]);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="relative w-full max-w-xl rounded-2xl border border-border bg-card p-6 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-border/60">
+          <h2 className="text-lg font-semibold text-foreground">Новая задача</h2>
+          <button
+            onClick={() => setIsCreateTaskOpen(false)}
+            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          {/* Project & Column Selection */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Проект *
+              </label>
+              <select
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+              >
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-card">
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Колонка
+              </label>
+              <select
+                value={columnId}
+                onChange={(e) => setColumnId(e.target.value)}
+                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+              >
+                {columns.map((c) => (
+                  <option key={c.id} value={c.id} className="bg-card">
+                    {c.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">
+              Название задачи *
+            </label>
+            <input
+              type="text"
+              placeholder="Например: Адаптивная вёрстка карточек"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+            />
+            {errors.title && (
+              <p className="mt-1 text-xs text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.title}
+              </p>
+            )}
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">
+              Описание
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Подробная информация о задаче..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full rounded-xl border border-border/80 bg-muted/40 p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
+            />
+          </div>
+
+          {/* Priority & Due Date & Estimate */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Приоритет
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as Priority)}
+                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+              >
+                <option value="P0" className="bg-card text-destructive font-medium">P0 — Критический</option>
+                <option value="P1" className="bg-card text-orange-500 font-medium">P1 — Высокий</option>
+                <option value="P2" className="bg-card text-blue-500 font-medium">P2 — Обычный</option>
+                <option value="P3" className="bg-card text-muted-foreground font-medium">P3 — Низкий</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Срок выполнения
+              </label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                Оценка времени
+              </label>
+              <input
+                type="text"
+                placeholder="4h / 2d"
+                value={timeEstimate}
+                onChange={(e) => setTimeEstimate(e.target.value)}
+                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs"
+              />
+            </div>
+          </div>
+
+          {/* Labels */}
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+              Метки
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {AVAILABLE_LABELS.map((label) => {
+                const isSelected = selectedLabels.some((l) => l.id === label.id);
+                return (
+                  <button
+                    key={label.id}
+                    type="button"
+                    onClick={() => toggleLabel(label)}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
+                      isSelected
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
+                        : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {label.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Assignees */}
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+              Исполнители
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {members.map((member) => {
+                const isSelected = assigneeIds.includes(member.id);
+                return (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onClick={() => toggleAssignee(member.id)}
+                    className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-medium border transition-all ${
+                      isSelected
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
+                        : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <span className="font-mono">{member.avatar}</span>
+                    <span>{member.name.split(" ")[0]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-border/60">
+            <button
+              type="button"
+              onClick={() => setIsCreateTaskOpen(false)}
+              className="rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              className="rounded-xl bg-ssj-purple px-5 py-2 text-sm font-medium text-white shadow-md hover:bg-ssj-purple/90"
+            >
+              Создать задачу
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
