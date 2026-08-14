@@ -67,11 +67,28 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsedState] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load saved sidebar state
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("ssjcorp-kanban:sidebar-collapsed");
+      if (saved === "true") {
+        setIsSidebarCollapsedState(true);
+      }
+    }
+  }, []);
+
+  const setIsSidebarCollapsed = (collapsed: boolean) => {
+    setIsSidebarCollapsedState(collapsed);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ssjcorp-kanban:sidebar-collapsed", String(collapsed));
+    }
+  };
+
   const toggleSidebar = () => {
-    setIsSidebarCollapsed((prev) => !prev);
+    setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
   // Sync active project to localStorage

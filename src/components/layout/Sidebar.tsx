@@ -18,11 +18,7 @@ import { useKanban } from "@/store/KanbanContext";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
-interface SidebarProps {
-  basePath?: string;
-}
-
-export const Sidebar: React.FC<SidebarProps> = () => {
+export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const {
     projects,
@@ -31,7 +27,6 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     setIsCreateProjectOpen,
     resetDemoData,
     isSidebarCollapsed,
-    setIsSidebarCollapsed,
     toggleSidebar,
   } = useKanban();
 
@@ -73,7 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r bg-card transition-all duration-300 ease-in-out border-border",
+          "fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r bg-card transition-all duration-300 ease-in-out border-border shadow-xs",
           isSidebarCollapsed ? "w-[72px]" : "w-[260px]",
           isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
@@ -81,25 +76,25 @@ export const Sidebar: React.FC<SidebarProps> = () => {
         {/* Header / Logo Bar */}
         <div className="flex h-16 items-center px-4 border-b border-border">
           {isSidebarCollapsed ? (
-            /* Collapsed mode: Centered Logo + Expand Button toggle */
-            <div className="flex w-full items-center justify-between">
+            /* Collapsed mode: Centered Logo box that expands on click */
+            <div className="flex w-full items-center justify-center">
               <button
                 onClick={toggleSidebar}
-                className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple hover:bg-ssj-purple/20 transition-all mx-auto"
-                title="Развернуть меню"
+                className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple hover:bg-ssj-purple/25 transition-all shadow-xs"
+                title="Развернуть боковое меню"
               >
-                <Logo className="h-full w-full" />
+                <Logo className="h-full w-full object-contain" />
               </button>
             </div>
           ) : (
-            /* Expanded mode: Logo + Title + Collapse Button */
+            /* Expanded mode: Logo + Title + Collapse Arrow Button */
             <div className="flex w-full items-center justify-between gap-2 overflow-hidden">
               <Link
                 href="/"
                 className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90 min-w-0"
               >
-                <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple">
-                  <Logo className="h-full w-full" />
+                <div className="h-10 w-10 shrink-0 aspect-square flex items-center justify-center rounded-xl bg-ssj-purple/15 border border-ssj-purple/30 p-2 text-ssj-purple shadow-xs">
+                  <Logo className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col truncate">
                   <span className="font-bold tracking-tight text-foreground text-sm flex items-center gap-1.5">
@@ -127,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
 
         {/* Navigation Links */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          <nav className="space-y-1.5">
+          <nav className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const cleanPathname = pathname.replace(/^\/kanban-front/, "") || "/";
@@ -135,32 +130,46 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                 cleanPathname === item.href ||
                 (item.href !== "/" && cleanPathname.startsWith(item.href));
 
+              if (isSidebarCollapsed) {
+                // Collapsed: Single centered square icon button
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={cn(
+                      "flex h-10 w-10 mx-auto items-center justify-center rounded-xl border transition-all shadow-xs",
+                      isActive
+                        ? "bg-ssj-purple text-white border-ssj-purple shadow-md shadow-ssj-purple/30"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                    title={item.label}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </Link>
+                );
+              }
+
+              // Expanded: Clean row with icon + text label
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl p-2 text-sm font-medium transition-all group",
+                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all border",
                     isActive
-                      ? "bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30 shadow-xs"
-                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                      ? "bg-ssj-purple/15 text-ssj-purple border-ssj-purple/40 shadow-xs"
+                      : "border-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   )}
-                  title={isSidebarCollapsed ? item.label : undefined}
                 >
-                  <div
+                  <Icon
                     className={cn(
-                      "h-9 w-9 shrink-0 aspect-square rounded-xl flex items-center justify-center transition-colors",
-                      isActive
-                        ? "bg-ssj-purple text-white shadow-md shadow-ssj-purple/30"
-                        : "bg-muted/50 text-muted-foreground group-hover:text-foreground group-hover:bg-muted"
+                      "h-4 w-4 shrink-0 transition-colors",
+                      isActive ? "text-ssj-purple" : "text-muted-foreground"
                     )}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  {!isSidebarCollapsed && (
-                    <span className="truncate font-semibold">{item.label}</span>
-                  )}
+                  />
+                  <span className="truncate">{item.label}</span>
                 </Link>
               );
             })}
@@ -183,12 +192,29 @@ export const Sidebar: React.FC<SidebarProps> = () => {
               </div>
             )}
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {projects.map((project) => {
                 const isSelected = activeProjectId === project.id;
                 const TypeIcon = project.type === "website" ? Globe : Bot;
-                const accentColor =
-                  project.type === "website" ? "text-ssj-web" : "text-ssj-bot";
+
+                if (isSidebarCollapsed) {
+                  return (
+                    <Link
+                      key={project.id}
+                      href={`/board/?project=${project.slug}`}
+                      onClick={() => handleProjectClick(project.id)}
+                      className={cn(
+                        "flex h-10 w-10 mx-auto items-center justify-center rounded-xl border transition-all shadow-xs",
+                        isSelected
+                          ? "bg-muted text-foreground border-ssj-purple/60"
+                          : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                      title={project.name}
+                    >
+                      <TypeIcon className="h-4 w-4" />
+                    </Link>
+                  );
+                }
 
                 return (
                   <Link
@@ -196,25 +222,20 @@ export const Sidebar: React.FC<SidebarProps> = () => {
                     href={`/board/?project=${project.slug}`}
                     onClick={() => handleProjectClick(project.id)}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl p-2 text-sm transition-all group",
+                      "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all border",
                       isSelected
-                        ? "bg-muted text-foreground font-semibold border border-border"
-                        : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                        ? "bg-muted text-foreground font-semibold border-border"
+                        : "border-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground"
                     )}
-                    title={isSidebarCollapsed ? project.name : undefined}
                   >
-                    <div
+                    <TypeIcon
                       className={cn(
-                        "h-9 w-9 shrink-0 aspect-square rounded-xl flex items-center justify-center bg-muted/40 border border-border/50",
-                        accentColor
+                        "h-4 w-4 shrink-0",
+                        project.type === "website" ? "text-ssj-web" : "text-ssj-bot"
                       )}
-                    >
-                      <TypeIcon className="h-4 w-4" />
-                    </div>
-                    {!isSidebarCollapsed && (
-                      <span className="truncate flex-1 font-medium">{project.name}</span>
-                    )}
-                    {!isSidebarCollapsed && isSelected && (
+                    />
+                    <span className="truncate flex-1 font-medium text-xs">{project.name}</span>
+                    {isSelected && (
                       <div className="h-1.5 w-1.5 rounded-full bg-ssj-purple animate-pulse" />
                     )}
                   </Link>
@@ -229,7 +250,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
           {isSidebarCollapsed ? (
             <button
               onClick={toggleSidebar}
-              className="flex w-full items-center justify-center h-9 rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="flex h-10 w-10 mx-auto items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               title="Развернуть меню"
             >
               <ChevronRight className="h-4 w-4" />
