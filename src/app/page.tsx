@@ -4,28 +4,20 @@ import React from "react";
 import Link from "next/link";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useKanban } from "@/store/KanbanContext";
-import { isTaskOverdue, calculateProjectStats } from "@/lib/utils/taskUtils";
-import { formatDateRelative } from "@/lib/utils/dateUtils";
-import { MagicCard } from "@/components/ui/MagicCard";
-import { BlurFade } from "@/components/ui/BlurFade";
 import { NumberTicker } from "@/components/ui/NumberTicker";
+import { MagicCard } from "@/components/ui/MagicCard";
 import { ProjectPulse } from "@/components/ui/ProjectPulse";
-import { Logo } from "@/components/ui/Logo";
+import { BlurFade } from "@/components/ui/BlurFade";
 import {
   KanbanSquare,
-  Globe,
-  Bot,
-  AlertTriangle,
   Calendar,
-  Layers,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  Ban,
+  CheckCircle2,
   Clock,
+  AlertTriangle,
   Plus,
+  ArrowRight,
+  TrendingUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function OverviewPage() {
   return (
@@ -36,230 +28,163 @@ export default function OverviewPage() {
 }
 
 function OverviewContent() {
-  const { projects, tasks, members, setIsCreateProjectOpen, setIsCreateTaskOpen } = useKanban();
+  const {
+    projects,
+    tasks,
+    setActiveProjectId,
+    setIsCreateTaskOpen,
+    setIsCreateProjectOpen,
+  } = useKanban();
 
-  const activeProjects = projects.filter((p) => p.status !== "archived");
+  const totalTasksCount = tasks.length;
+  const completedTasksCount = tasks.filter((t) => t.columnId === "done").length;
+  const overdueTasksCount = tasks.filter(
+    (t) => t.dueDate && t.dueDate < new Date().toISOString().split("T")[0] && t.columnId !== "done"
+  ).length;
+  const blockedTasksCount = tasks.filter((t) => t.isBlocked).length;
 
-  // Global aggregate metrics
-  const activeTasks = tasks.filter((t) => t.columnId !== "done" && !t.completedAt);
-  const inProgressTasksCount = tasks.filter((t) => t.columnId === "in_progress").length;
-  
-  // Overdue calculation using centralized isTaskOverdue utility
-  const overdueTasksCount = tasks.filter(isTaskOverdue).length;
-
-  // Due within 7 days
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dueThisWeekCount = tasks.filter((t) => {
-    if (!t.dueDate || t.columnId === "done" || Boolean(t.completedAt)) return false;
-    const due = new Date(t.dueDate);
-    due.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= 7;
-  }).length;
-
-  // Average progress across active projects
-  const totalProjectProgress = activeProjects.reduce((sum, proj) => {
-    const projTasks = tasks.filter((t) => t.projectId === proj.id);
-    const completed = projTasks.filter((t) => t.columnId === "done" || Boolean(t.completedAt)).length;
-    return sum + (projTasks.length > 0 ? (completed / projTasks.length) * 100 : 0);
-  }, 0);
-
-  const avgProgressPct =
-    activeProjects.length > 0 ? Math.round(totalProjectProgress / activeProjects.length) : 0;
-
-  // Projects at risk count
-  const projectsAtRiskCount = activeProjects.filter((p) => {
-    const pTasks = tasks.filter((t) => t.projectId === p.id);
-    const stats = calculateProjectStats(p, pTasks);
-    return stats.health === "risk" || stats.health === "critical";
-  }).length;
+  const overallProgress =
+    totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-8">
-      {/* Header Banner */}
-      <BlurFade delay={0.05}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/40">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-lg bg-ssj-purple/15 border border-ssj-purple/30 p-1 text-ssj-purple flex items-center justify-center">
-                <Logo className="h-full w-full object-contain" />
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                Обзор проектов SSJCorp
-                <Sparkles className="h-4 w-4 text-ssj-purple shrink-0" />
-              </h1>
+    <div className="space-y-8 w-full max-w-none pb-8">
+      {/* Top Banner / Hero Welcome */}
+      <BlurFade delay={0.05} className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-r from-ssj-purple/15 via-ssj-purple/5 to-transparent p-6 md:p-8 shadow-sm">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-xl bg-ssj-purple/20 px-3 py-1 text-xs font-mono font-bold text-ssj-purple border border-ssj-purple/30">
+              <TrendingUp className="h-3.5 w-3.5" />
+              <span>Фирменный стиль SSJCorp</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Центральная телеметрия проектов, распределения задач и здоровья процессов
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
+              Обзор проектов и метрики команды
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Центральный хаб управления веб-разработкой и ботами SSJCorp. Отслеживайте дедлайны, прогресс и блокировки в реальном времени.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
               onClick={() => setIsCreateProjectOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-all shadow-xs"
+              className="flex items-center gap-2 rounded-2xl border border-border/80 bg-card px-4 py-2.5 text-xs font-bold text-foreground hover:bg-muted transition-all shadow-xs"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
               <span>Новый проект</span>
             </button>
             <button
               onClick={() => setIsCreateTaskOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-ssj-purple px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-ssj-purple/90 transition-all"
+              className="flex items-center gap-2 rounded-2xl bg-ssj-purple px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-ssj-purple/90 transition-all active:scale-95"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
               <span>Создать задачу</span>
             </button>
           </div>
         </div>
       </BlurFade>
 
-      {/* Bento Grid Top Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Large Bento Box: Active Projects Aggregate & Progress */}
-        <BlurFade delay={0.1} className="md:col-span-2">
-          <div className="h-full rounded-2xl border border-border/60 bg-card/90 p-5 shadow-sm space-y-4 backdrop-blur-md flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
-                  Команда & Активные проекты
-                </span>
-                <div className="text-2xl font-bold font-mono text-foreground flex items-center gap-2">
-                  <NumberTicker value={activeProjects.length} />
-                  <span className="text-xs font-sans text-muted-foreground font-normal">проекта в работе</span>
-                </div>
-              </div>
-
-              {projectsAtRiskCount > 0 ? (
-                <span className="inline-flex items-center gap-1 rounded-xl bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-xs font-mono font-semibold text-amber-500">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  <span>{projectsAtRiskCount} под риском</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 rounded-xl bg-ssj-web/15 border border-ssj-web/30 px-2.5 py-1 text-xs font-mono font-semibold text-ssj-web">
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>Все в норме</span>
-                </span>
-              )}
+      {/* Metrics Row (4 Bento Chips with Number Ticker) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Metric 1: Total Tasks */}
+        <BlurFade delay={0.1}>
+          <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+              <span>Всего задач</span>
+              <KanbanSquare className="h-4 w-4 text-ssj-purple" />
             </div>
-
-            {/* Average Progress Track */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs font-mono">
-                <span className="text-muted-foreground">Средний прогресс по компании</span>
-                <span className="font-bold text-ssj-purple">{avgProgressPct}%</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-zinc-800 border border-border/40 overflow-hidden">
-                <div
-                  className="h-full bg-ssj-purple transition-all duration-700 rounded-full"
-                  style={{ width: `${avgProgressPct}%` }}
-                />
-              </div>
+            <div className="text-2xl font-extrabold text-foreground font-mono">
+              <NumberTicker value={totalTasksCount} />
             </div>
+            <p className="text-[11px] text-muted-foreground">Во всех проектах</p>
           </div>
         </BlurFade>
 
-        {/* Bento Box 2: Tasks in Progress */}
-        <BlurFade delay={0.15}>
-          <div className="h-full rounded-2xl border border-border/60 bg-card/90 p-5 shadow-sm space-y-2 backdrop-blur-md flex flex-col justify-between">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider">В работе</span>
-              <Sparkles className="h-4 w-4 text-ssj-purple" />
+        {/* Metric 2: Completed */}
+        <BlurFade delay={0.12}>
+          <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+              <span>Завершено</span>
+              <CheckCircle2 className="h-4 w-4 text-ssj-web" />
             </div>
-            <div className="text-3xl font-bold font-mono text-ssj-purple">
-              <NumberTicker value={inProgressTasksCount} />
+            <div className="text-2xl font-extrabold text-ssj-web font-mono">
+              <NumberTicker value={completedTasksCount} />
             </div>
-            <p className="text-[11px] text-muted-foreground">Задач в активной разработке</p>
+            <p className="text-[11px] text-muted-foreground">Общий прогресс: {overallProgress}%</p>
           </div>
         </BlurFade>
 
-        {/* Bento Box 3: Overdue */}
-        <BlurFade delay={0.2}>
-          <div className="h-full rounded-2xl border border-border/60 bg-card/90 p-5 shadow-sm space-y-2 backdrop-blur-md flex flex-col justify-between">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider">Просрочено</span>
+        {/* Metric 3: Overdue */}
+        <BlurFade delay={0.14}>
+          <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+              <span>Просрочено</span>
               <AlertTriangle className="h-4 w-4 text-destructive" />
             </div>
-            <div className="text-3xl font-bold font-mono text-destructive">
+            <div className="text-2xl font-extrabold text-destructive font-mono">
               <NumberTicker value={overdueTasksCount} />
             </div>
-            <p className="text-[11px] text-destructive/80 font-medium">Требуют скорейшего внимания</p>
+            <p className="text-[11px] text-muted-foreground">Требуют внимания</p>
+          </div>
+        </BlurFade>
+
+        {/* Metric 4: Blocked */}
+        <BlurFade delay={0.16}>
+          <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-2xs space-y-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+              <span>Блокировки</span>
+              <Clock className="h-4 w-4 text-amber-500" />
+            </div>
+            <div className="text-2xl font-extrabold text-amber-500 font-mono">
+              <NumberTicker value={blockedTasksCount} />
+            </div>
+            <p className="text-[11px] text-muted-foreground">Заблокированы командами</p>
           </div>
         </BlurFade>
       </div>
 
-      {/* Projects Grid Section */}
+      {/* Active Projects Grid (Magic Cards) */}
       <div className="space-y-4">
-        <BlurFade delay={0.25}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-foreground tracking-tight flex items-center gap-2">
-              <Layers className="h-4 w-4 text-ssj-purple" />
-              Проекты компании ({projects.length})
-            </h2>
-          </div>
-        </BlurFade>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-foreground">Проекты команды</h2>
+          <span className="text-xs font-mono text-muted-foreground">
+            Активных: {projects.length}
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, idx) => {
-            const projectTasks = tasks.filter((t) => t.projectId === project.id);
-            const leadMember = members.find((m) => m.id === project.leadId);
-            const teamMembers = members.filter((m) => project.memberIds.includes(m.id));
-            const TypeIcon = project.type === "website" ? Globe : Bot;
-
-            return (
-              <BlurFade key={project.id} delay={0.3 + idx * 0.08}>
-                <MagicCard className="h-full">
-                  <div className="flex flex-col h-full justify-between space-y-5">
-                    {/* Top Row: Type Badge + Health */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border",
-                            project.type === "website"
-                              ? "bg-ssj-web/15 text-ssj-web border-ssj-web/30"
-                              : "bg-ssj-bot/15 text-ssj-bot border-ssj-bot/30"
-                          )}
-                        >
-                          <TypeIcon className="h-3.5 w-3.5" />
-                          <span>{project.type === "website" ? "Сайт" : "Telegram-бот"}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {projects.map((project, idx) => (
+            <BlurFade key={project.id} delay={0.2 + idx * 0.05}>
+              <div className="space-y-3">
+                <MagicCard className="p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-bold text-foreground">{project.name}</h3>
+                        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30">
+                          {project.type === "website" ? "Сайт" : "Telegram-бот"}
                         </span>
                       </div>
-
-                      <h3 className="text-base font-bold text-foreground group-hover:text-ssj-purple transition-colors">
-                        {project.name}
-                      </h3>
-
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {project.description}
                       </p>
                     </div>
 
-                    {/* Project Pulse Component */}
-                    <ProjectPulse project={project} tasks={tasks} compact />
-
-                    {/* Footer Row: Lead, Team, Go to Board button */}
-                    <div className="flex items-center justify-between pt-3 border-t border-border/40 text-xs">
-                      {leadMember && (
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <span className="text-[11px] font-mono">Lead:</span>
-                          <span className="font-semibold text-foreground">{leadMember.name}</span>
-                        </div>
-                      )}
-
-                      <Link
-                        href={`/board/?project=${project.slug}`}
-                        className="flex items-center gap-1 font-semibold text-ssj-purple hover:underline"
-                      >
-                        <span>На доску</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </div>
+                    <Link
+                      href={`/board/?project=${project.slug}`}
+                      onClick={() => setActiveProjectId(project.id)}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-background text-muted-foreground hover:bg-ssj-purple hover:text-white transition-all shadow-2xs shrink-0"
+                      title="Открыть канбан-доску проекта"
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
                 </MagicCard>
-              </BlurFade>
-            );
-          })}
+
+                {/* Project Pulse Card */}
+                <ProjectPulse project={project} tasks={tasks} />
+              </div>
+            </BlurFade>
+          ))}
         </div>
       </div>
     </div>

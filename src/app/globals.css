@@ -49,6 +49,47 @@
   }
 }
 
+/* 
+  Desktop Fluid Design Tokens System (1024px+)
+  Scales layout, paddings, typography, icons and card sizes fluidly up to 2K (2560px) & 4K (3840px).
+  Mobile breakpoints (< 1024px) are 100% preserved.
+*/
+@media (min-width: 1024px) {
+  :root {
+    /* Layout Shell Dimensions */
+    --sidebar-width: clamp(260px, 15vw, 340px);
+    --sidebar-collapsed-width: clamp(72px, 4.5vw, 88px);
+    --header-height: clamp(64px, 4.2vw, 84px);
+
+    /* Fluid Paddings & Spacing */
+    --page-padding-x: clamp(20px, 1.8vw, 44px);
+    --page-padding-y: clamp(18px, 1.5vw, 36px);
+    --board-gap: clamp(14px, 1.1vw, 24px);
+    --card-padding: clamp(14px, 1.0vw, 22px);
+
+    /* Fluid Column Min Width */
+    --col-min-width: clamp(270px, 17.5vw, 360px);
+
+    /* Fluid Typography System */
+    --font-2xs: clamp(10px, 0.65vw, 13px);
+    --font-xs: clamp(11px, 0.72vw, 15px);
+    --font-sm: clamp(12px, 0.82vw, 16px);
+    --font-base: clamp(14px, 0.95vw, 18px);
+    --font-lg: clamp(16px, 1.1vw, 22px);
+    --font-xl: clamp(18px, 1.3vw, 26px);
+    --font-2xl: clamp(22px, 1.6vw, 32px);
+    --font-3xl: clamp(28px, 2.0vw, 40px);
+
+    /* Fluid Icon & Element Sizes */
+    --icon-sm: clamp(14px, 0.85vw, 18px);
+    --icon-md: clamp(16px, 1.0vw, 22px);
+    --icon-lg: clamp(20px, 1.25vw, 28px);
+
+    /* Fluid Border Radius */
+    --radius-panel: clamp(12px, 0.8vw, 20px);
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -65,6 +106,52 @@
   .dark select option {
     background-color: #141416;
     color: #e7e7e7;
+  }
+}
+
+/* Fluid Desktop Utility Helper Classes */
+@media (min-width: 1024px) {
+  .fluid-sidebar-w {
+    width: var(--sidebar-width, 260px) !important;
+  }
+  .fluid-sidebar-w-collapsed {
+    width: var(--sidebar-collapsed-width, 72px) !important;
+  }
+  .fluid-sidebar-pl {
+    padding-left: var(--sidebar-width, 260px) !important;
+  }
+  .fluid-sidebar-pl-collapsed {
+    padding-left: var(--sidebar-collapsed-width, 72px) !important;
+  }
+  .fluid-header-h {
+    height: var(--header-height, 64px) !important;
+  }
+  .fluid-main-padding {
+    padding: var(--page-padding-y, 20px) var(--page-padding-x, 24px) !important;
+  }
+  .fluid-card-p {
+    padding: var(--card-padding, 14px) !important;
+  }
+  .fluid-board-gap {
+    gap: var(--board-gap, 16px) !important;
+  }
+  .fluid-text-xs {
+    font-size: var(--font-xs, 11px) !important;
+  }
+  .fluid-text-sm {
+    font-size: var(--font-sm, 12px) !important;
+  }
+  .fluid-text-base {
+    font-size: var(--font-base, 14px) !important;
+  }
+  .fluid-text-lg {
+    font-size: var(--font-lg, 16px) !important;
+  }
+  .fluid-text-xl {
+    font-size: var(--font-xl, 18px) !important;
+  }
+  .fluid-text-2xl {
+    font-size: var(--font-2xl, 22px) !important;
   }
 }
 

@@ -51,7 +51,7 @@ function BoardContent() {
     Boolean(filters.onlyBlocked);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-8">
+    <div className="space-y-6 w-full max-w-none pb-8">
       {/* Active Project Header & Quick Filter Bar */}
       <BlurFade delay={0.05} className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-border/40">

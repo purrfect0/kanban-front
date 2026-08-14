@@ -42,15 +42,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* Sidebar (Level 1 Shell) */}
       <Sidebar />
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Fluid Sidebar Padding */}
       <div
         className={cn(
           "relative z-10 flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out min-h-screen",
-          isSidebarCollapsed ? "lg:pl-[72px]" : "lg:pl-[260px]"
+          isSidebarCollapsed
+            ? "fluid-sidebar-pl-collapsed lg:pl-[72px]"
+            : "fluid-sidebar-pl lg:pl-[260px]"
         )}
       >
         <Header onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
-        <main className="flex-1 p-3 sm:p-4 md:p-6">
+        <main className="flex-1 p-3 sm:p-4 fluid-main-padding">
           {children}
         </main>
       </div>
