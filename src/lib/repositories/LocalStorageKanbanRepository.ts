@@ -7,7 +7,7 @@ import {
   INITIAL_MEMBERS,
 } from "@/data/seedData";
 
-const STORAGE_KEY = "ssjcorp-kanban:v1";
+const STORAGE_KEY = "ssjcorp-kanban:v3";
 
 interface StorageSchema {
   projects: Project[];

@@ -215,7 +215,7 @@ export const CreateProjectModal: React.FC = () => {
                     }`}
                   >
                     <span className="font-mono">{member.avatar}</span>
-                    <span>{member.name.split(" ")[0]}</span>
+                    <span>{member.name}</span>
                   </button>
                 );
               })}

@@ -1,9 +1,9 @@
 import { Member, Project, Column, Task } from "@/types/kanban";
 
 export const INITIAL_MEMBERS: Member[] = [
-  { id: "m1", name: "Александр Соколов", role: "Team Lead / Fullstack", avatar: "АС" },
-  { id: "m2", name: "Андрей Морозов", role: "Frontend Developer", avatar: "АМ" },
-  { id: "m3", name: "Кирилл Иванов", role: "Backend & Bot Developer", avatar: "КИ" },
+  { id: "m1", name: "Александр", role: "Team Lead / Fullstack", avatar: "АЛ" },
+  { id: "m2", name: "Андрей", role: "Frontend Developer", avatar: "АН" },
+  { id: "m3", name: "Кирилл", role: "Backend & Bot Developer", avatar: "КИ" },
 ];
 
 export const INITIAL_COLUMNS: Column[] = [
@@ -76,7 +76,7 @@ export const INITIAL_TASKS: Task[] = [
       { id: "l1", name: "Frontend", color: "#7C6CF6" },
       { id: "l2", name: "UI/UX", color: "#22C55E" },
     ],
-    assigneeIds: ["m3"],
+    assigneeIds: ["m2"],
     dueDate: getRelativeDateStr(-5),
     timeEstimate: "16h",
     checklist: [
@@ -97,7 +97,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Настроить валидацию формы заявки и отправку уведомлений.",
     priority: "P0",
     labels: [{ id: "l1", name: "Frontend", color: "#7C6CF6" }],
-    assigneeIds: ["m3", "m1"],
+    assigneeIds: ["m2", "m1"],
     dueDate: getRelativeDateStr(0), // Today
     timeEstimate: "6h",
     checklist: [
@@ -157,7 +157,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Настроить dynamic title, description и og:image для шеринга в соцсетях.",
     priority: "P3",
     labels: [{ id: "l4", name: "SEO", color: "#06B6D4" }],
-    assigneeIds: ["m3"],
+    assigneeIds: ["m2"],
     dueDate: getRelativeDateStr(10),
     checklist: [],
     isBlocked: false,
@@ -177,7 +177,7 @@ export const INITIAL_TASKS: Task[] = [
       { id: "l2", name: "UI/UX", color: "#22C55E" },
       { id: "l1", name: "Frontend", color: "#7C6CF6" },
     ],
-    assigneeIds: ["m2", "m3"],
+    assigneeIds: ["m2", "m1"],
     dueDate: getRelativeDateStr(1),
     timeEstimate: "20h",
     checklist: [
@@ -198,7 +198,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Подключить внешнюю систему бронирования через API widget.",
     priority: "P1",
     labels: [{ id: "l5", name: "API Integration", color: "#EC4899" }],
-    assigneeIds: ["m3"],
+    assigneeIds: ["m2"],
     dueDate: getRelativeDateStr(-3), // Overdue
     timeEstimate: "10h",
     checklist: [],
@@ -215,7 +215,7 @@ export const INITIAL_TASKS: Task[] = [
     priority: "P3",
     labels: [{ id: "l2", name: "UI/UX", color: "#22C55E" }],
     assigneeIds: ["m2"],
-    dueDate: undefined, // No due date
+    dueDate: undefined,
     checklist: [],
     isBlocked: false,
     createdAt: "2026-08-09T16:00:00Z",

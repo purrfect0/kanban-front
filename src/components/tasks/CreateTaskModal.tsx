@@ -102,13 +102,13 @@ export const CreateTaskModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-xl rounded-2xl border border-border bg-card p-6 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-2xl border border-border bg-card text-card-foreground p-6 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border/60">
-          <h2 className="text-lg font-semibold text-foreground">Новая задача</h2>
+        <div className="flex items-center justify-between pb-4 border-b border-border">
+          <h2 className="text-lg font-bold text-foreground">Новая задача</h2>
           <button
             onClick={() => setIsCreateTaskOpen(false)}
-            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -118,13 +118,13 @@ export const CreateTaskModal: React.FC = () => {
           {/* Project & Column Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Проект *
               </label>
               <select
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -135,13 +135,13 @@ export const CreateTaskModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Колонка
               </label>
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
               >
                 {columns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -154,7 +154,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Название задачи *
             </label>
             <input
@@ -162,7 +162,7 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Например: Адаптивная вёрстка карточек"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+              className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple transition-colors"
             />
             {errors.title && (
               <p className="mt-1 text-xs text-destructive flex items-center gap-1">
@@ -174,7 +174,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
+            <label className="block text-xs font-semibold text-foreground mb-1">
               Описание
             </label>
             <textarea
@@ -182,20 +182,20 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Подробная информация о задаче..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
+              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none transition-colors"
             />
           </div>
 
           {/* Priority & Due Date & Estimate */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Приоритет
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
               >
                 <option value="P0" className="text-destructive font-medium">P0 — Критический</option>
                 <option value="P1" className="text-orange-500 font-medium">P1 — Высокий</option>
@@ -205,19 +205,19 @@ export const CreateTaskModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Срок выполнения
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Оценка времени
               </label>
               <input
@@ -225,14 +225,14 @@ export const CreateTaskModal: React.FC = () => {
                 placeholder="4h / 2d"
                 value={timeEstimate}
                 onChange={(e) => setTimeEstimate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs transition-colors"
               />
             </div>
           </div>
 
           {/* Labels */}
           <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+            <label className="block text-xs font-semibold text-foreground mb-1.5">
               Метки
             </label>
             <div className="flex flex-wrap gap-2">
@@ -246,7 +246,7 @@ export const CreateTaskModal: React.FC = () => {
                     className={`rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
                       isSelected
                         ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
-                        : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {label.name}
@@ -258,7 +258,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Assignees */}
           <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+            <label className="block text-xs font-semibold text-foreground mb-1.5">
               Исполнители
             </label>
             <div className="flex flex-wrap gap-2">
@@ -271,12 +271,12 @@ export const CreateTaskModal: React.FC = () => {
                     onClick={() => toggleAssignee(member.id)}
                     className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-medium border transition-all ${
                       isSelected
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
-                        : "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground"
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    <span className="font-mono">{member.avatar}</span>
-                    <span>{member.name.split(" ")[0]}</span>
+                    <span className="font-mono text-[11px]">{member.avatar}</span>
+                    <span>{member.name}</span>
                   </button>
                 );
               })}
@@ -284,17 +284,17 @@ export const CreateTaskModal: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-border/60">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={() => setIsCreateTaskOpen(false)}
-              className="rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-ssj-purple px-5 py-2 text-sm font-medium text-white shadow-md hover:bg-ssj-purple/90"
+              className="rounded-xl bg-ssj-purple px-5 py-2 text-sm font-medium text-white shadow-md hover:bg-ssj-purple/90 transition-all"
             >
               Создать задачу
             </button>

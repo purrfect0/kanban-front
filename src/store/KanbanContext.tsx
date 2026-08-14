@@ -110,7 +110,9 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setThemeState(savedTheme);
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
   }, []);
@@ -120,7 +122,9 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem("ssjcorp-kanban:theme", t);
     if (t === "dark") {
       document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
   };

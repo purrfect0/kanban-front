@@ -239,7 +239,7 @@ function OverviewContent() {
                           {progressPct}% ({completedTasks}/{projectTasks.length})
                         </span>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                      <div className="h-1.5 w-full bg-transparent overflow-hidden rounded-full">
                         <div
                           className="h-full bg-ssj-purple transition-all duration-500 rounded-full"
                           style={{ width: `${progressPct}%` }}
