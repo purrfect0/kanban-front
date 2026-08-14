@@ -32,7 +32,7 @@ export const ToastContainer: React.FC<ToastProps> = ({ toast, onDismiss }) => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-blur-fade max-w-md w-full px-4">
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-300 dark:border-zinc-800 bg-card text-card-foreground p-4 shadow-2xl backdrop-blur-md">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card text-card-foreground p-4 shadow-2xl backdrop-blur-md">
         <div className="flex items-start gap-3 min-w-0">
           <Icon className="h-5 w-5 text-ssj-purple shrink-0 mt-0.5" />
           <div className="space-y-0.5 min-w-0">
