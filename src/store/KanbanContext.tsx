@@ -106,19 +106,23 @@ export const KanbanProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Theme management
   useEffect(() => {
-    const savedTheme = localStorage.getItem("ssjcorp-kanban:theme") as "dark" | "light" | null;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
-    } else {
+    const savedTheme = (localStorage.getItem("ssjcorp-kanban:theme") as "dark" | "light" | null) || "dark";
+    setThemeState(savedTheme);
+    if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
   const setTheme = (t: "dark" | "light") => {
     setThemeState(t);
     localStorage.setItem("ssjcorp-kanban:theme", t);
-    document.documentElement.classList.toggle("dark", t === "dark");
+    if (t === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
   const toggleTheme = () => {

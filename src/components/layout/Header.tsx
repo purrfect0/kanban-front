@@ -93,7 +93,7 @@ export const Header: React.FC = () => {
               className="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer pr-1"
             >
               {projects.map((p) => (
-                <option key={p.id} value={p.id} className="bg-card text-foreground">
+                <option key={p.id} value={p.id}>
                   {p.name} ({p.type === "website" ? "Сайт" : "Бот"})
                 </option>
               ))}
@@ -115,9 +115,9 @@ export const Header: React.FC = () => {
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, searchQuery: e.target.value }))
             }
-            className="h-9 w-64 rounded-xl border border-border/80 bg-muted/40 pl-9 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus:border-ssj-purple focus:outline-none focus:ring-1 focus:ring-ssj-purple transition-all"
+            className="h-9 w-64 rounded-xl border border-border bg-background pl-9 pr-14 text-sm text-foreground placeholder:text-muted-foreground focus:border-ssj-purple focus:outline-none focus:ring-1 focus:ring-ssj-purple transition-all"
           />
-          <kbd className="absolute right-2.5 flex h-5 select-none items-center gap-1 rounded border border-border/80 bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <kbd className="absolute right-2.5 flex h-5 select-none items-center gap-1 rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
             ⌘K
           </kbd>
         </div>
@@ -137,7 +137,7 @@ export const Header: React.FC = () => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           title={theme === "dark" ? "Переключить на светлую тему" : "Переключить на тёмную тему"}
         >
           {theme === "dark" ? (
@@ -147,12 +147,12 @@ export const Header: React.FC = () => {
           )}
         </button>
 
-        {/* Team Avatars Stack */}
-        <div className="hidden lg:flex items-center -space-x-2 overflow-hidden px-1">
-          {members.slice(0, 4).map((member) => (
+        {/* Team Avatars */}
+        <div className="hidden lg:flex items-center gap-1.5 px-1">
+          {members.slice(0, 3).map((member) => (
             <div
               key={member.id}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-ssj-purple/20 text-xs font-mono font-medium text-ssj-purple shadow-sm"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-ssj-purple/30 bg-ssj-purple/15 text-xs font-mono font-semibold text-ssj-purple shadow-xs"
               title={`${member.name} (${member.role})`}
             >
               {member.avatar || member.name.substring(0, 2).toUpperCase()}

@@ -139,7 +139,7 @@ export const CreateProjectModal: React.FC = () => {
               placeholder="Например: SSJCorp Website"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+              className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
             />
             {errors.name && (
               <p className="mt-1 text-xs text-destructive flex items-center gap-1">
@@ -159,7 +159,7 @@ export const CreateProjectModal: React.FC = () => {
               placeholder="Краткое описание целей и стека проекта..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-xl border border-border/80 bg-muted/40 p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
+              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
             />
           </div>
 
@@ -172,10 +172,10 @@ export const CreateProjectModal: React.FC = () => {
               <select
                 value={leadId}
                 onChange={(e) => setLeadId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               >
                 {members.map((m) => (
-                  <option key={m.id} value={m.id} className="bg-card">
+                  <option key={m.id} value={m.id}>
                     {m.name} ({m.role})
                   </option>
                 ))}
@@ -190,7 +190,7 @@ export const CreateProjectModal: React.FC = () => {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               />
             </div>
           </div>

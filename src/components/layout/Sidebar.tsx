@@ -20,6 +20,8 @@ import {
 import { useKanban } from "@/store/KanbanContext";
 import { cn } from "@/lib/utils";
 
+import { Logo } from "@/components/ui/Logo";
+
 interface SidebarProps {
   basePath?: string;
 }
@@ -84,15 +86,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ basePath = "" }) => {
             href="/"
             className="flex items-center gap-3 overflow-hidden transition-opacity hover:opacity-90"
           >
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2">
-              <Image
-                src="/logo.svg"
-                alt="SSJCorp Logo"
-                width={32}
-                height={32}
-                className="h-full w-full object-contain filter invert dark:invert-0"
-                priority
-              />
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ssj-purple/10 border border-ssj-purple/20 p-2 text-ssj-purple">
+              <Logo className="h-full w-full" />
             </div>
             {!isCollapsed && (
               <div className="flex flex-col">

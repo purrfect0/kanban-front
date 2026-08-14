@@ -139,7 +139,7 @@ function DeadlinesContent() {
           <select
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
           >
             <option value="all">Все проекты</option>
             {projects.map((p) => (
@@ -153,7 +153,7 @@ function DeadlinesContent() {
           <select
             value={assigneeFilter}
             onChange={(e) => setAssigneeFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
           >
             <option value="all">Все исполнители</option>
             {members.map((m) => (
@@ -167,7 +167,7 @@ function DeadlinesContent() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
           >
             <option value="all">Все приоритеты</option>
             <option value="P0">P0 — Критический</option>

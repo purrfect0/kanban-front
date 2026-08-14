@@ -239,7 +239,7 @@ export const TaskDetailSheet: React.FC = () => {
           </div>
 
           {/* Settings Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-border/80 bg-muted/20 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-border bg-card p-4 shadow-xs">
             {/* Column */}
             <div>
               <label className="text-xs font-medium text-muted-foreground block mb-1">
@@ -251,7 +251,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setColumnId(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
               >
                 {columns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -272,7 +272,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setPriority(e.target.value as Priority);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
               >
                 <option value="P0">P0 — Критический</option>
                 <option value="P1">P1 — Высокий</option>
@@ -294,7 +294,7 @@ export const TaskDetailSheet: React.FC = () => {
                     setDueDate(e.target.value);
                     setIsDirty(true);
                   }}
-                  className="w-full h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground outline-none"
+                  className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
                 />
                 {dueDate && (
                   <span
@@ -328,7 +328,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setTimeEstimate(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-mono outline-none"
+                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground font-mono outline-none focus:border-ssj-purple"
               />
             </div>
           </div>
@@ -346,7 +346,7 @@ export const TaskDetailSheet: React.FC = () => {
                 setIsDirty(true);
               }}
               placeholder="Добавьте подробное описание задачи..."
-              className="w-full rounded-2xl border border-border/80 bg-muted/20 p-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
+              className="w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none shadow-xs"
             />
           </div>
 
@@ -484,12 +484,12 @@ export const TaskDetailSheet: React.FC = () => {
                     addChecklistItem();
                   }
                 }}
-                className="flex-1 h-9 rounded-xl border border-border/80 bg-muted/40 px-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+                className="flex-1 h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
               />
               <button
                 type="button"
                 onClick={addChecklistItem}
-                className="h-9 px-3 rounded-xl bg-muted border border-border/80 text-xs font-medium text-foreground hover:bg-muted/80 flex items-center gap-1"
+                className="h-9 px-3 rounded-xl bg-background border border-border text-xs font-medium text-foreground hover:bg-muted flex items-center gap-1"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Добавить</span>
@@ -498,7 +498,7 @@ export const TaskDetailSheet: React.FC = () => {
           </div>
 
           {/* Blocked Flag Options */}
-          <div className="rounded-2xl border border-border/80 bg-muted/20 p-4 space-y-3">
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-foreground flex items-center gap-2">
                 <Ban className="h-4 w-4 text-destructive" />
@@ -523,7 +523,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setBlockedReason(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-destructive/40 bg-card px-3 text-xs text-foreground outline-none"
+                className="w-full h-9 rounded-xl border border-destructive/40 bg-background px-3 text-xs text-foreground outline-none focus:border-destructive"
               />
             )}
           </div>

@@ -5,47 +5,47 @@
 @layer base {
   :root {
     --background: 0 0% 98%;
-    --foreground: 0 0% 4%;
+    --foreground: 240 10% 4.1%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
+    --card-foreground: 240 10% 4.1%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
-    --primary: 250 89% 69%;
+    --popover-foreground: 240 10% 4.1%;
+    --primary: 248 89% 69%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 15%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 42%;
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 15%;
-    --destructive: 0 84% 60%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 250 89% 69%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 248 89% 69%;
     --radius: 0.75rem;
   }
 
   .dark {
     --background: 0 0% 2%;
     --foreground: 0 0% 96%;
-    --card: 240 3% 6%;
+    --card: 240 4% 6%;
     --card-foreground: 0 0% 96%;
-    --popover: 240 3% 6%;
+    --popover: 240 4% 6%;
     --popover-foreground: 0 0% 96%;
-    --primary: 250 89% 69%;
+    --primary: 248 89% 69%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 9%;
+    --secondary: 240 4% 10%;
     --secondary-foreground: 0 0% 96%;
-    --muted: 240 4% 9%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 240 4% 9%;
+    --muted: 240 4% 10%;
+    --muted-foreground: 240 4% 60%;
+    --accent: 240 4% 10%;
     --accent-foreground: 0 0% 96%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 100% / 0.08;
-    --input: 0 0% 100% / 0.08;
-    --ring: 250 89% 69%;
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 248 89% 69%;
   }
 }
 
@@ -55,6 +55,11 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-ssj-purple/20 selection:text-ssj-purple;
+  }
+  
+  /* Fix native select options in dark/light themes */
+  option {
+    @apply bg-background text-foreground;
   }
 }
 
@@ -67,11 +72,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 108, 246, 0.2);
+  background: rgba(124, 108, 246, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 108, 246, 0.4);
+  background: rgba(124, 108, 246, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

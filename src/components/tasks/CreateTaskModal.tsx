@@ -124,10 +124,10 @@ export const CreateTaskModal: React.FC = () => {
               <select
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               >
                 {projects.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-card">
+                  <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
                 ))}
@@ -141,10 +141,10 @@ export const CreateTaskModal: React.FC = () => {
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               >
                 {columns.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-card">
+                  <option key={c.id} value={c.id}>
                     {c.title}
                   </option>
                 ))}
@@ -162,7 +162,7 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Например: Адаптивная вёрстка карточек"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+              className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
             />
             {errors.title && (
               <p className="mt-1 text-xs text-destructive flex items-center gap-1">
@@ -182,7 +182,7 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Подробная информация о задаче..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-xl border border-border/80 bg-muted/40 p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
+              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none"
             />
           </div>
 
@@ -195,12 +195,12 @@ export const CreateTaskModal: React.FC = () => {
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               >
-                <option value="P0" className="bg-card text-destructive font-medium">P0 — Критический</option>
-                <option value="P1" className="bg-card text-orange-500 font-medium">P1 — Высокий</option>
-                <option value="P2" className="bg-card text-blue-500 font-medium">P2 — Обычный</option>
-                <option value="P3" className="bg-card text-muted-foreground font-medium">P3 — Низкий</option>
+                <option value="P0" className="text-destructive font-medium">P0 — Критический</option>
+                <option value="P1" className="text-orange-500 font-medium">P1 — Высокий</option>
+                <option value="P2" className="text-blue-500 font-medium">P2 — Обычный</option>
+                <option value="P3" className="text-muted-foreground font-medium">P3 — Низкий</option>
               </select>
             </div>
 
@@ -212,7 +212,7 @@ export const CreateTaskModal: React.FC = () => {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple"
               />
             </div>
 
@@ -225,7 +225,7 @@ export const CreateTaskModal: React.FC = () => {
                 placeholder="4h / 2d"
                 value={timeEstimate}
                 onChange={(e) => setTimeEstimate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border/80 bg-muted/40 px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs"
+                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs"
               />
             </div>
           </div>

@@ -2,9 +2,8 @@ import { Member, Project, Column, Task } from "@/types/kanban";
 
 export const INITIAL_MEMBERS: Member[] = [
   { id: "m1", name: "Александр Соколов", role: "Team Lead / Fullstack", avatar: "АС" },
-  { id: "m2", name: "Екатерина Морозова", role: "UI/UX Designer", avatar: "ЕМ" },
-  { id: "m3", name: "Дмитрий Иванов", role: "Frontend Developer", avatar: "ДИ" },
-  { id: "m4", name: "Максим Волков", role: "Telegram Bot Developer", avatar: "МВ" },
+  { id: "m2", name: "Андрей Морозов", role: "Frontend Developer", avatar: "АМ" },
+  { id: "m3", name: "Кирилл Иванов", role: "Backend & Bot Developer", avatar: "КИ" },
 ];
 
 export const INITIAL_COLUMNS: Column[] = [
@@ -49,8 +48,8 @@ export const INITIAL_PROJECTS: Project[] = [
     type: "telegram-bot",
     status: "active",
     description: "Telegram-бот для автоматического захвата заявок клиентов и квалификации.",
-    leadId: "m4",
-    memberIds: ["m1", "m4"],
+    leadId: "m3",
+    memberIds: ["m1", "m3"],
     dueDate: "2026-08-25",
     createdAt: "2026-08-08T09:00:00Z",
     updatedAt: "2026-08-14T12:00:00Z",
@@ -232,7 +231,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Составить блок-схему взаимодействия с клиентом от приветствия до квалификации.",
     priority: "P1",
     labels: [{ id: "l6", name: "Bot Logic", color: "#29A9EB" }],
-    assigneeIds: ["m4"],
+    assigneeIds: ["m3"],
     dueDate: getRelativeDateStr(-6),
     timeEstimate: "8h",
     checklist: [
@@ -251,7 +250,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Разработать асинхронный обработчик событий Telegram API.",
     priority: "P0",
     labels: [{ id: "l6", name: "Bot Logic", color: "#29A9EB" }],
-    assigneeIds: ["m4", "m1"],
+    assigneeIds: ["m3", "m1"],
     dueDate: getRelativeDateStr(0), // Today
     timeEstimate: "12h",
     checklist: [
@@ -270,7 +269,7 @@ export const INITIAL_TASKS: Task[] = [
     description: "Автоматическое создание карточки сделки в CRM при завершении диалога.",
     priority: "P1",
     labels: [{ id: "l5", name: "API Integration", color: "#EC4899" }],
-    assigneeIds: ["m4"],
+    assigneeIds: ["m3"],
     dueDate: getRelativeDateStr(3),
     timeEstimate: "14h",
     checklist: [
