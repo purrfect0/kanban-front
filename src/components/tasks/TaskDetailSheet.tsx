@@ -9,15 +9,11 @@ import {
   Plus,
   AlertTriangle,
   Clock,
-  User,
-  Tag,
-  Calendar,
-  CheckCircle2,
   Ban,
   Save,
 } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
-import { Priority, Label, ChecklistItem, Task } from "@/types/kanban";
+import { Priority, Label, ChecklistItem } from "@/types/kanban";
 import { getTaskDeadlineStatus } from "@/lib/repositories/KanbanRepository";
 import { cn } from "@/lib/utils";
 
@@ -165,15 +161,15 @@ export const TaskDetailSheet: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-      <div className="relative flex h-full w-full max-w-2xl flex-col bg-card border-l border-border shadow-2xl animate-fade-in overflow-y-auto">
+      <div className="relative flex h-full w-full max-w-2xl flex-col border-l border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0F0F10] text-slate-900 dark:text-slate-100 shadow-2xl animate-fade-in overflow-y-auto">
         {/* Top Sticky Bar */}
-        <div className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-card/90 px-6 backdrop-blur border-border/80">
+        <div className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 dark:border-zinc-800 bg-white/95 dark:bg-[#0F0F10]/95 px-6 backdrop-blur">
           <div className="flex items-center gap-3">
             <span className="rounded-lg bg-ssj-purple/15 px-2.5 py-1 font-mono text-xs font-semibold text-ssj-purple border border-ssj-purple/30">
               {selectedTask.id}
             </span>
             {project && (
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-xs font-medium text-slate-500 dark:text-zinc-400">
                 {project.name}
               </span>
             )}
@@ -188,7 +184,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             <button
               onClick={handleSave}
-              className="flex items-center gap-1.5 rounded-xl bg-ssj-purple px-4 py-2 text-xs font-medium text-white shadow-md hover:bg-ssj-purple/90"
+              className="flex items-center gap-1.5 rounded-xl bg-ssj-purple px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-ssj-purple/90 transition-all"
             >
               <Save className="h-3.5 w-3.5" />
               <span>Сохранить</span>
@@ -204,7 +200,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             <button
               onClick={handleClose}
-              className="rounded-xl border border-border p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="rounded-xl border border-slate-200 dark:border-zinc-800 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -234,15 +230,15 @@ export const TaskDetailSheet: React.FC = () => {
                 setIsDirty(true);
               }}
               placeholder="Название задачи..."
-              className="w-full text-xl font-bold text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-ssj-purple outline-none pb-1 transition-colors"
+              className="w-full text-xl font-bold text-slate-900 dark:text-slate-100 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-zinc-700 focus:border-ssj-purple outline-none pb-1 transition-colors"
             />
           </div>
 
           {/* Settings Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] p-4">
             {/* Column */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
                 Колонка
               </label>
               <select
@@ -251,7 +247,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setColumnId(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 {columns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -263,7 +259,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Priority */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
                 Приоритет
               </label>
               <select
@@ -272,7 +268,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setPriority(e.target.value as Priority);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 <option value="P0">P0 — Критический</option>
                 <option value="P1">P1 — Высокий</option>
@@ -283,7 +279,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Due Date */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
                 Срок выполнения
               </label>
               <div className="flex items-center gap-2">
@@ -294,7 +290,7 @@ export const TaskDetailSheet: React.FC = () => {
                     setDueDate(e.target.value);
                     setIsDirty(true);
                   }}
-                  className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+                  className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
                 />
                 {dueDate && (
                   <span
@@ -317,7 +313,7 @@ export const TaskDetailSheet: React.FC = () => {
 
             {/* Time Estimate */}
             <div>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">
+              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">
                 Оценка времени
               </label>
               <input
@@ -328,14 +324,14 @@ export const TaskDetailSheet: React.FC = () => {
                   setTimeEstimate(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground font-mono outline-none focus:border-ssj-purple"
+                className="w-full h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 font-mono outline-none focus:border-ssj-purple transition-all"
               />
             </div>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
               Описание
             </label>
             <textarea
@@ -346,13 +342,13 @@ export const TaskDetailSheet: React.FC = () => {
                 setIsDirty(true);
               }}
               placeholder="Добавьте подробное описание задачи..."
-              className="w-full rounded-2xl border border-border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none shadow-xs"
+              className="w-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] p-4 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-ssj-purple resize-none transition-all"
             />
           </div>
 
           {/* Labels */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
               Метки
             </label>
             <div className="flex flex-wrap gap-2">
@@ -372,8 +368,8 @@ export const TaskDetailSheet: React.FC = () => {
                     }}
                     className={`rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
                       isSelected
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
-                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
+                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
                     }`}
                   >
                     {label.name}
@@ -385,7 +381,7 @@ export const TaskDetailSheet: React.FC = () => {
 
           {/* Assignees */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+            <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
               Исполнители
             </label>
             <div className="flex flex-wrap gap-2">
@@ -405,11 +401,11 @@ export const TaskDetailSheet: React.FC = () => {
                     }}
                     className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-medium border transition-all ${
                       isAssigned
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
-                        : "border-border/60 bg-muted/20 text-muted-foreground hover:text-foreground"
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
+                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
                     }`}
                   >
-                    <span className="font-mono">{member.avatar}</span>
+                    <span className="font-mono text-[11px]">{member.avatar}</span>
                     <span>{member.name}</span>
                   </button>
                 );
@@ -420,11 +416,11 @@ export const TaskDetailSheet: React.FC = () => {
           {/* Checklist */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+              <label className="text-xs font-semibold text-slate-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
                 Чек-лист ({completedChecklistCount}/{checklist.length})
               </label>
               {checklist.length > 0 && (
-                <div className="h-1.5 w-32 rounded-full bg-muted overflow-hidden">
+                <div className="h-1.5 w-32 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
                   <div
                     className="h-full bg-ssj-purple transition-all duration-300"
                     style={{
@@ -439,7 +435,7 @@ export const TaskDetailSheet: React.FC = () => {
               {checklist.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-sm group"
+                  className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] px-3 py-2 text-sm group"
                 >
                   <button
                     type="button"
@@ -449,12 +445,12 @@ export const TaskDetailSheet: React.FC = () => {
                     {item.completed ? (
                       <CheckSquare className="h-4 w-4 text-ssj-purple shrink-0" />
                     ) : (
-                      <Square className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <Square className="h-4 w-4 text-slate-400 shrink-0" />
                     )}
                     <span
                       className={cn(
-                        "text-foreground",
-                        item.completed && "line-through text-muted-foreground"
+                        "text-slate-900 dark:text-slate-100",
+                        item.completed && "line-through text-slate-400 dark:text-zinc-500"
                       )}
                     >
                       {item.text}
@@ -464,7 +460,7 @@ export const TaskDetailSheet: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => deleteChecklistItem(item.id)}
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity p-1"
+                    className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-destructive transition-opacity p-1"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -484,12 +480,12 @@ export const TaskDetailSheet: React.FC = () => {
                     addChecklistItem();
                   }
                 }}
-                className="flex-1 h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple"
+                className="flex-1 h-9 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-ssj-purple"
               />
               <button
                 type="button"
                 onClick={addChecklistItem}
-                className="h-9 px-3 rounded-xl bg-background border border-border text-xs font-medium text-foreground hover:bg-muted flex items-center gap-1"
+                className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-700 flex items-center gap-1"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Добавить</span>
@@ -498,9 +494,9 @@ export const TaskDetailSheet: React.FC = () => {
           </div>
 
           {/* Blocked Flag Options */}
-          <div className="rounded-2xl border border-border bg-card p-4 space-y-3 shadow-xs">
+          <div className="rounded-2xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-[#141416] p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-foreground flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-2">
                 <Ban className="h-4 w-4 text-destructive" />
                 Заблокировать задачу
               </span>
@@ -523,7 +519,7 @@ export const TaskDetailSheet: React.FC = () => {
                   setBlockedReason(e.target.value);
                   setIsDirty(true);
                 }}
-                className="w-full h-9 rounded-xl border border-destructive/40 bg-background px-3 text-xs text-foreground outline-none focus:border-destructive"
+                className="w-full h-9 rounded-xl border border-destructive/40 bg-white dark:bg-[#0F0F10] px-3 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-destructive"
               />
             )}
           </div>
@@ -532,24 +528,24 @@ export const TaskDetailSheet: React.FC = () => {
         {/* Delete Confirmation Dialog Modal */}
         {showDeleteConfirm && (
           <div className="absolute inset-0 z-20 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4 text-center">
+            <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0F0F10] p-6 shadow-2xl space-y-4 text-center">
               <AlertTriangle className="h-10 w-10 text-destructive mx-auto" />
-              <h3 className="text-base font-semibold text-foreground">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                 Удалить задачу {selectedTask.id}?
               </h3>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 Это действие нельзя отменить. Задача будет безвозвратно удалена из доски.
               </p>
               <div className="flex justify-center gap-3 pt-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="rounded-xl px-4 py-2 text-xs font-medium text-muted-foreground hover:bg-muted"
+                  className="rounded-xl px-4 py-2 text-xs font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="rounded-xl bg-destructive px-4 py-2 text-xs font-medium text-white shadow-md hover:bg-destructive/90"
+                  className="rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-destructive/90"
                 >
                   Да, удалить
                 </button>

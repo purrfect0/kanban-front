@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 import { useKanban } from "@/store/KanbanContext";
 import { Priority, Label } from "@/types/kanban";
 
@@ -102,13 +102,13 @@ export const CreateTaskModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-xl rounded-2xl border border-border bg-card text-card-foreground p-6 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-xl rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-[#0F0F10] text-slate-900 dark:text-slate-100 p-6 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border">
-          <h2 className="text-lg font-bold text-foreground">Новая задача</h2>
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-zinc-800">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Новая задача</h2>
           <button
             onClick={() => setIsCreateTaskOpen(false)}
-            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -118,13 +118,13 @@ export const CreateTaskModal: React.FC = () => {
           {/* Project & Column Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Проект *
               </label>
               <select
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
+                className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -135,13 +135,13 @@ export const CreateTaskModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Колонка
               </label>
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
+                className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 {columns.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -154,7 +154,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
               Название задачи *
             </label>
             <input
@@ -162,7 +162,7 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Например: Адаптивная вёрстка карточек"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple transition-colors"
+              className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-ssj-purple transition-all"
             />
             {errors.title && (
               <p className="mt-1 text-xs text-destructive flex items-center gap-1">
@@ -174,7 +174,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
               Описание
             </label>
             <textarea
@@ -182,42 +182,42 @@ export const CreateTaskModal: React.FC = () => {
               placeholder="Подробная информация о задаче..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ssj-purple resize-none transition-colors"
+              className="w-full rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] p-3 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-ssj-purple resize-none transition-all"
             />
           </div>
 
           {/* Priority & Due Date & Estimate */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Приоритет
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
+                className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 <option value="P0" className="text-destructive font-medium">P0 — Критический</option>
                 <option value="P1" className="text-orange-500 font-medium">P1 — Высокий</option>
                 <option value="P2" className="text-blue-500 font-medium">P2 — Обычный</option>
-                <option value="P3" className="text-muted-foreground font-medium">P3 — Низкий</option>
+                <option value="P3" className="text-slate-500 dark:text-zinc-400 font-medium">P3 — Низкий</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Срок выполнения
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple transition-colors"
+                className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                 Оценка времени
               </label>
               <input
@@ -225,14 +225,14 @@ export const CreateTaskModal: React.FC = () => {
                 placeholder="4h / 2d"
                 value={timeEstimate}
                 onChange={(e) => setTimeEstimate(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-ssj-purple font-mono text-xs transition-colors"
+                className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple font-mono text-xs transition-all"
               />
             </div>
           </div>
 
           {/* Labels */}
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1.5">
               Метки
             </label>
             <div className="flex flex-wrap gap-2">
@@ -245,8 +245,8 @@ export const CreateTaskModal: React.FC = () => {
                     onClick={() => toggleLabel(label)}
                     className={`rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
                       isSelected
-                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                        ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
+                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
                     }`}
                   >
                     {label.name}
@@ -258,7 +258,7 @@ export const CreateTaskModal: React.FC = () => {
 
           {/* Assignees */}
           <div>
-            <label className="block text-xs font-semibold text-foreground mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1.5">
               Исполнители
             </label>
             <div className="flex flex-wrap gap-2">
@@ -269,10 +269,10 @@ export const CreateTaskModal: React.FC = () => {
                     key={member.id}
                     type="button"
                     onClick={() => toggleAssignee(member.id)}
-                    className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-medium border transition-all ${
+                    className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium border transition-all ${
                       isSelected
                         ? "bg-ssj-purple/20 text-ssj-purple border-ssj-purple/50 font-semibold"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                        : "border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-[#141416] text-slate-700 dark:text-zinc-300 hover:border-ssj-purple/50"
                     }`}
                   >
                     <span className="font-mono text-[11px]">{member.avatar}</span>
@@ -284,17 +284,17 @@ export const CreateTaskModal: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-border">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-zinc-800">
             <button
               type="button"
               onClick={() => setIsCreateTaskOpen(false)}
-              className="rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-ssj-purple px-5 py-2 text-sm font-medium text-white shadow-md hover:bg-ssj-purple/90 transition-all"
+              className="rounded-xl bg-ssj-purple px-5 py-2 text-sm font-semibold text-white shadow-md hover:bg-ssj-purple/90 transition-all"
             >
               Создать задачу
             </button>
