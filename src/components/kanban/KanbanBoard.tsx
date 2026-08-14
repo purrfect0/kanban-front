@@ -105,12 +105,12 @@ export const KanbanBoard: React.FC = () => {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      {/* Horizontal Scroll Kanban Container */}
-      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scroll-smooth min-h-[calc(100vh-140px)]">
+      {/* Horizontal Flex Kanban Container */}
+      <div className="flex gap-4 h-full items-start overflow-x-auto overflow-y-hidden pb-2">
         {columns.map((column, index) => {
           const colTasks = projectTasks.filter((t) => t.columnId === column.id);
           return (
-            <BlurFade key={column.id} delay={0.06 * index} className="snap-start shrink-0">
+            <BlurFade key={column.id} delay={0.06 * index} className="h-full shrink-0">
               <KanbanColumn column={column} tasks={colTasks} members={members} />
             </BlurFade>
           );
