@@ -18,6 +18,7 @@ import { useKanban } from "@/store/KanbanContext";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskCard } from "./TaskCard";
 import { Task } from "@/types/kanban";
+import { BlurFade } from "@/components/ui/BlurFade";
 
 export const KanbanBoard: React.FC = () => {
   const {
@@ -33,7 +34,7 @@ export const KanbanBoard: React.FC = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px drag intent to prevent accidental clicks
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -41,7 +42,6 @@ export const KanbanBoard: React.FC = () => {
     })
   );
 
-  // Filter tasks for current active project
   const projectTasks = filteredTasks.filter(
     (t) => !activeProjectId || t.projectId === activeProjectId
   );
@@ -61,11 +61,9 @@ export const KanbanBoard: React.FC = () => {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find columns
     const activeTaskItem = projectTasks.find((t) => t.id === activeId);
     if (!activeTaskItem) return;
 
-    // Is over a column or another task?
     let targetColumnId = overId;
     const overTaskItem = projectTasks.find((t) => t.id === overId);
     if (overTaskItem) {
@@ -109,12 +107,12 @@ export const KanbanBoard: React.FC = () => {
     >
       {/* Horizontal Scroll Kanban Container */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scroll-smooth min-h-[calc(100vh-140px)]">
-        {columns.map((column) => {
+        {columns.map((column, index) => {
           const colTasks = projectTasks.filter((t) => t.columnId === column.id);
           return (
-            <div key={column.id} className="snap-start shrink-0">
+            <BlurFade key={column.id} delay={0.06 * index} className="snap-start shrink-0">
               <KanbanColumn column={column} tasks={colTasks} members={members} />
-            </div>
+            </BlurFade>
           );
         })}
       </div>

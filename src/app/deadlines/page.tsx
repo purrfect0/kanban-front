@@ -3,16 +3,13 @@
 import React, { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useKanban } from "@/store/KanbanContext";
-import { Task, Priority } from "@/types/kanban";
-import { getTaskDeadlineStatus } from "@/lib/repositories/KanbanRepository";
+import { Task } from "@/types/kanban";
+import { BlurFade } from "@/components/ui/BlurFade";
 import {
   Calendar,
   AlertTriangle,
   Clock,
-  CheckCircle2,
-  Filter,
-  User,
-  Folder,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -123,69 +120,71 @@ function DeadlinesContent() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Subheader & Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-border/40">
-        <div>
-          <h2 className="text-xl font-bold text-foreground tracking-tight">
-            Сроки и дедлайны
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Все задачи проектов SSJCorp, сгруппированные по временным интервалам
-          </p>
+      <BlurFade delay={0.05}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-border/40">
+          <div>
+            <h2 className="text-xl font-bold text-foreground tracking-tight">
+              Сроки и дедлайны
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Все задачи проектов SSJCorp, сгруппированные по временным интервалам
+            </p>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Filter Project */}
+            <select
+              value={projectFilter}
+              onChange={(e) => setProjectFilter(e.target.value)}
+              className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+            >
+              <option value="all">Все проекты</option>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Filter Assignee */}
+            <select
+              value={assigneeFilter}
+              onChange={(e) => setAssigneeFilter(e.target.value)}
+              className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+            >
+              <option value="all">Все исполнители</option>
+              {members.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Filter Priority */}
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
+            >
+              <option value="all">Все приоритеты</option>
+              <option value="P0">P0 — Критический</option>
+              <option value="P1">P1 — Высокий</option>
+              <option value="P2">P2 — Обычный</option>
+              <option value="P3">P3 — Низкий</option>
+            </select>
+          </div>
         </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Filter Project */}
-          <select
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
-          >
-            <option value="all">Все проекты</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Filter Assignee */}
-          <select
-            value={assigneeFilter}
-            onChange={(e) => setAssigneeFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
-          >
-            <option value="all">Все исполнители</option>
-            {members.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Filter Priority */}
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-            className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground outline-none focus:border-ssj-purple"
-          >
-            <option value="all">Все приоритеты</option>
-            <option value="P0">P0 — Критический</option>
-            <option value="P1">P1 — Высокий</option>
-            <option value="P2">P2 — Обычный</option>
-            <option value="P3">P3 — Низкий</option>
-          </select>
-        </div>
-      </div>
+      </BlurFade>
 
       {/* Timeframe Groups */}
       <div className="space-y-6">
-        {periods.map((period) => {
+        {periods.map((period, pIdx) => {
           if (period.count === 0) return null;
           const Icon = period.icon;
 
           return (
-            <div key={period.title} className="space-y-3">
+            <BlurFade key={period.title} delay={0.1 + pIdx * 0.08} className="space-y-3">
               <div className="flex items-center gap-2">
                 <div
                   className={cn(
@@ -202,7 +201,7 @@ function DeadlinesContent() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {period.tasks.map((task) => {
+                {period.tasks.map((task, tIdx) => {
                   const proj = projects.find((p) => p.id === task.projectId);
                   const col = columns.find((c) => c.id === task.columnId);
                   const assigned = members.filter((m) =>
@@ -210,55 +209,56 @@ function DeadlinesContent() {
                   );
 
                   return (
-                    <div
-                      key={task.id}
-                      onClick={() => setSelectedTask(task)}
-                      className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all space-y-3"
-                    >
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-mono font-semibold text-ssj-purple bg-ssj-purple/10 px-2 py-0.5 rounded-lg border border-ssj-purple/20">
-                            {task.id}
-                          </span>
-                          {proj && (
-                            <span className="text-[11px] text-muted-foreground font-medium truncate">
-                              {proj.name}
+                    <BlurFade key={task.id} delay={0.15 + tIdx * 0.04}>
+                      <div
+                        onClick={() => setSelectedTask(task)}
+                        className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all space-y-3 group"
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-mono font-semibold text-ssj-purple bg-ssj-purple/10 px-2 py-0.5 rounded-lg border border-ssj-purple/20">
+                              {task.id}
                             </span>
-                          )}
+                            {proj && (
+                              <span className="text-[11px] text-muted-foreground font-medium truncate">
+                                {proj.name}
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="text-sm font-semibold text-foreground line-clamp-2 group-hover:text-ssj-purple transition-colors">
+                            {task.title}
+                          </h4>
                         </div>
 
-                        <h4 className="text-sm font-semibold text-foreground line-clamp-2">
-                          {task.title}
-                        </h4>
+                        <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-2 font-mono text-[11px]">
+                            {col && (
+                              <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">
+                                {col.title}
+                              </span>
+                            )}
+                            {task.dueDate && <span>{task.dueDate}</span>}
+                          </div>
+
+                          <div className="flex items-center -space-x-1">
+                            {assigned.map((m) => (
+                              <div
+                                key={m.id}
+                                className="flex h-6 w-6 items-center justify-center rounded-full bg-ssj-purple/20 text-[10px] font-mono text-ssj-purple border border-card"
+                                title={m.name}
+                              >
+                                {m.avatar}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-2 font-mono text-[11px]">
-                          {col && (
-                            <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">
-                              {col.title}
-                            </span>
-                          )}
-                          {task.dueDate && <span>{task.dueDate}</span>}
-                        </div>
-
-                        <div className="flex items-center -space-x-1">
-                          {assigned.map((m) => (
-                            <div
-                              key={m.id}
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-ssj-purple/20 text-[10px] font-mono text-ssj-purple border border-card"
-                              title={m.name}
-                            >
-                              {m.avatar}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    </BlurFade>
                   );
                 })}
               </div>
-            </div>
+            </BlurFade>
           );
         })}
       </div>

@@ -6,6 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Plus, ChevronDown, ChevronRight, AlertCircle } from "lucide-react";
 import { Column, Task, Member } from "@/types/kanban";
 import { TaskCard } from "./TaskCard";
+import { BlurFade } from "@/components/ui/BlurFade";
 import { useKanban } from "@/store/KanbanContext";
 import { cn } from "@/lib/utils";
 
@@ -107,8 +108,10 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
           strategy={verticalListSortingStrategy}
         >
           <div className="flex-1 space-y-3 overflow-y-auto pr-1 min-h-[150px] max-h-[calc(100vh-220px)]">
-            {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} members={members} />
+            {tasks.map((task, idx) => (
+              <BlurFade key={task.id} delay={0.08 + idx * 0.04}>
+                <TaskCard task={task} members={members} />
+              </BlurFade>
             ))}
 
             {tasks.length === 0 && (

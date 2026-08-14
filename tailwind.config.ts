@@ -79,10 +79,15 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "blur-fade": {
+          "0%": { opacity: "0", filter: "blur(6px)", transform: "translateY(10px) scale(0.98)" },
+          "100%": { opacity: "1", filter: "blur(0)", transform: "translateY(0) scale(1)" },
+        },
       },
       animation: {
         "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
         "fade-in": "fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+        "blur-fade": "blur-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
       },
     },
   },
