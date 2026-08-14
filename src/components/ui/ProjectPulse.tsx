@@ -3,7 +3,7 @@
 import React from "react";
 import { Project, Task } from "@/types/kanban";
 import { calculateProjectStats } from "@/lib/utils/taskUtils";
-import { formatDateCompact, formatDateRelative } from "@/lib/utils/dateUtils";
+import { formatDateRelative } from "@/lib/utils/dateUtils";
 import { Logo } from "@/components/ui/Logo";
 import { AlertTriangle, ShieldCheck, AlertCircle, Clock, CheckCircle2, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ interface ProjectPulseProps {
   project: Project;
   tasks: Task[];
   compact?: boolean;
+  hideCardWrapper?: boolean;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export const ProjectPulse: React.FC<ProjectPulseProps> = ({
   project,
   tasks,
   compact = false,
+  hideCardWrapper = false,
   className,
 }) => {
   const projectTasks = tasks.filter((t) => t.projectId === project.id);
@@ -97,13 +99,8 @@ export const ProjectPulse: React.FC<ProjectPulseProps> = ({
     );
   }
 
-  return (
-    <div
-      className={cn(
-        "relative rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-md space-y-3.5 transition-all overflow-hidden",
-        className
-      )}
-    >
+  const innerContent = (
+    <div className="space-y-3.5 relative overflow-hidden">
       {/* Background Soft Glow */}
       <div
         className={cn(
@@ -217,6 +214,21 @@ export const ProjectPulse: React.FC<ProjectPulseProps> = ({
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  if (hideCardWrapper) {
+    return <div className={className}>{innerContent}</div>;
+  }
+
+  return (
+    <div
+      className={cn(
+        "relative rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur-md space-y-3.5 transition-all overflow-hidden",
+        className
+      )}
+    >
+      {innerContent}
     </div>
   );
 };

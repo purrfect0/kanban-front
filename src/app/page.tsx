@@ -10,7 +10,6 @@ import { ProjectPulse } from "@/components/ui/ProjectPulse";
 import { BlurFade } from "@/components/ui/BlurFade";
 import {
   KanbanSquare,
-  Calendar,
   CheckCircle2,
   Clock,
   AlertTriangle,
@@ -142,7 +141,7 @@ function OverviewContent() {
         </BlurFade>
       </div>
 
-      {/* Active Projects Grid (Magic Cards) */}
+      {/* Active Projects Grid (Unified Single Cards with Dividers) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">Проекты команды</h2>
@@ -154,35 +153,37 @@ function OverviewContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project, idx) => (
             <BlurFade key={project.id} delay={0.2 + idx * 0.05}>
-              <div className="space-y-3">
-                <MagicCard className="p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-foreground">{project.name}</h3>
-                        <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30">
-                          {project.type === "website" ? "Сайт" : "Telegram-бот"}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {project.description}
-                      </p>
+              <MagicCard className="p-5 space-y-4">
+                {/* Upper Section: Project Title, Type Badge, Description & Navigation Arrow */}
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-foreground">{project.name}</h3>
+                      <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-lg bg-ssj-purple/15 text-ssj-purple border border-ssj-purple/30">
+                        {project.type === "website" ? "Сайт" : "Telegram-бот"}
+                      </span>
                     </div>
-
-                    <Link
-                      href={`/board/?project=${project.slug}`}
-                      onClick={() => setActiveProjectId(project.id)}
-                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-background text-muted-foreground hover:bg-ssj-purple hover:text-white transition-all shadow-2xs shrink-0"
-                      title="Открыть канбан-доску проекта"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {project.description}
+                    </p>
                   </div>
-                </MagicCard>
 
-                {/* Project Pulse Card */}
-                <ProjectPulse project={project} tasks={tasks} />
-              </div>
+                  <Link
+                    href={`/board/?project=${project.slug}`}
+                    onClick={() => setActiveProjectId(project.id)}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-background text-muted-foreground hover:bg-ssj-purple hover:text-white transition-all shadow-2xs shrink-0"
+                    title="Открыть канбан-доску проекта"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+
+                {/* Clean Horizontal Dividing Line */}
+                <div className="border-t border-border/40 pt-4">
+                  {/* Embedded Project Pulse Telemetry Panel */}
+                  <ProjectPulse project={project} tasks={tasks} hideCardWrapper />
+                </div>
+              </MagicCard>
             </BlurFade>
           ))}
         </div>
