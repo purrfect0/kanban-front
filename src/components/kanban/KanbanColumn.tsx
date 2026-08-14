@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Plus, ChevronDown, ChevronRight, AlertCircle } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { Column, Task, Member } from "@/types/kanban";
 import { TaskCard } from "./TaskCard";
 import { BlurFade } from "@/components/ui/BlurFade";
@@ -54,7 +54,6 @@ const COLUMN_STATUS_THEMES: Record<
 
 export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, members }) => {
   const { setIsCreateTaskOpen } = useKanban();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
@@ -69,112 +68,79 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
     <div
       ref={setNodeRef}
       className={cn(
-        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/90 dark:bg-[#0D0D10] p-3 transition-all duration-200 h-fit shadow-sm",
-        isCollapsed ? "w-16" : "w-[300px] sm:w-[320px]",
+        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/90 dark:bg-[#0D0D10] p-3.5 transition-all duration-200 h-fit shadow-sm w-full min-w-0",
         isOver && columnTheme.drop
       )}
     >
       {/* Status Top Accent Line */}
       <div className={cn("absolute top-0 left-4 right-4 h-[2px] rounded-full", columnTheme.line)} />
 
-      {/* Sticky Column Header */}
-      <div className="sticky top-16 z-10 flex items-center justify-between pb-3 pt-1 px-1 bg-slate-100/95 dark:bg-[#0D0D10]/95 backdrop-blur border-b border-border/40 shrink-0">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            title={isCollapsed ? "Развернуть колонку" : "Свернуть колонку"}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-
-          {!isCollapsed && (
-            <div className="flex items-center gap-2 truncate">
-              <div className={cn("h-2 w-2 rounded-full shrink-0", columnTheme.dot)} />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-foreground truncate font-mono">
-                {column.title}
-              </h2>
-            </div>
-          )}
+      {/* Column Header */}
+      <div className="flex items-center justify-between pb-3 pt-1 border-b border-border/40 shrink-0">
+        <div className="flex items-center gap-2 truncate">
+          <div className={cn("h-2.5 w-2.5 rounded-full shrink-0", columnTheme.dot)} />
+          <h2 className="text-xs font-bold uppercase tracking-wider text-foreground truncate font-mono">
+            {column.title}
+          </h2>
         </div>
 
-        {/* Counter & WIP limit Pill */}
-        <div className="flex items-center gap-1.5">
-          {!isCollapsed && (
-            <div
-              className={cn(
-                "flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-help",
-                isWipExceeded
-                  ? "bg-destructive/20 text-destructive border-destructive/50 animate-pulse"
-                  : isWipWarning
-                  ? "bg-amber-500/20 text-amber-500 border-amber-500/50"
-                  : columnTheme.pill
-              )}
-              title={
-                column.wipLimit
-                  ? `WIP-лимит: ${tasks.length}/${column.wipLimit} задач в работе`
-                  : undefined
-              }
-            >
-              <span>{tasks.length}</span>
-              {column.wipLimit && <span>/{column.wipLimit}</span>}
-              {isWipExceeded && <AlertCircle className="h-3 w-3 text-destructive" />}
-            </div>
-          )}
+        {/* Counter & WIP limit Pill & Add Button */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div
+            className={cn(
+              "flex items-center gap-1 font-mono text-[11px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-help",
+              isWipExceeded
+                ? "bg-destructive/20 text-destructive border-destructive/50 animate-pulse"
+                : isWipWarning
+                ? "bg-amber-500/20 text-amber-500 border-amber-500/50"
+                : columnTheme.pill
+            )}
+            title={
+              column.wipLimit
+                ? `WIP-лимит: ${tasks.length}/${column.wipLimit} задач в работе`
+                : undefined
+            }
+          >
+            <span>{tasks.length}</span>
+            {column.wipLimit && <span>/{column.wipLimit}</span>}
+            {isWipExceeded && <AlertCircle className="h-3 w-3 text-destructive" />}
+          </div>
 
-          {!isCollapsed && (
-            <button
-              onClick={() => setIsCreateTaskOpen(true)}
-              className="rounded-lg p-1 text-muted-foreground hover:bg-ssj-purple/20 hover:text-ssj-purple transition-colors"
-              title="Быстро добавить задачу"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            onClick={() => setIsCreateTaskOpen(true)}
+            className="rounded-lg p-1 text-muted-foreground hover:bg-ssj-purple/20 hover:text-ssj-purple transition-colors"
+            title="Быстро добавить задачу"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
-      {/* Collapsed State View */}
-      {isCollapsed ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-6 gap-4">
-          <span className="font-mono text-xs font-bold tracking-widest uppercase text-muted-foreground [writing-mode:vertical-lr] rotate-180">
-            {column.title}
-          </span>
-          <span className={cn("font-mono text-xs font-bold px-2 py-1 rounded-lg border", columnTheme.pill)}>
-            {tasks.length}
-          </span>
-        </div>
-      ) : (
-        /* Task Cards Sortable Container */
-        <SortableContext
-          items={tasks.map((t) => t.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-3 pt-3 pr-1">
-            {tasks.map((task, idx) => (
-              <BlurFade key={task.id} delay={0.05 + idx * 0.03}>
-                <TaskCard task={task} members={members} />
-              </BlurFade>
-            ))}
+      {/* Task Cards Sortable Container */}
+      <SortableContext
+        items={tasks.map((t) => t.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-3 pt-3">
+          {tasks.map((task, idx) => (
+            <BlurFade key={task.id} delay={0.05 + idx * 0.03}>
+              <TaskCard task={task} members={members} />
+            </BlurFade>
+          ))}
 
-            {tasks.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8 rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground space-y-2">
-                <p>Колонка пуста</p>
-                <button
-                  onClick={() => setIsCreateTaskOpen(true)}
-                  className="text-ssj-purple font-semibold hover:underline"
-                >
-                  + Добавить задачу
-                </button>
-              </div>
-            )}
-          </div>
-        </SortableContext>
-      )}
+          {tasks.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-8 rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground space-y-2">
+              <p>Колонка пуста</p>
+              <button
+                onClick={() => setIsCreateTaskOpen(true)}
+                className="text-ssj-purple font-semibold hover:underline"
+              >
+                + Добавить задачу
+              </button>
+            </div>
+          )}
+        </div>
+      </SortableContext>
     </div>
   );
 };

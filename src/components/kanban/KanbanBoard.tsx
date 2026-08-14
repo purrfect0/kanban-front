@@ -105,12 +105,16 @@ export const KanbanBoard: React.FC = () => {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      {/* Horizontal Flex Kanban Container */}
-      <div className="flex gap-4 items-start overflow-x-auto pb-6 scroll-smooth min-h-[400px]">
+      {/* 
+        Responsive Kanban Container:
+        - Mobile (< lg): flex horizontal scroll container (overflow-x-auto)
+        - Desktop (lg:): 5-column grid (lg:grid lg:grid-cols-5) with NO horizontal scrollbar
+      */}
+      <div className="flex lg:grid lg:grid-cols-5 gap-3 sm:gap-4 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 items-start w-full min-w-0">
         {columns.map((column, index) => {
           const colTasks = projectTasks.filter((t) => t.columnId === column.id);
           return (
-            <BlurFade key={column.id} delay={0.06 * index} className="shrink-0">
+            <BlurFade key={column.id} delay={0.06 * index} className="shrink-0 lg:shrink min-w-[280px] sm:min-w-[300px] lg:min-w-0 w-full">
               <KanbanColumn column={column} tasks={colTasks} members={members} />
             </BlurFade>
           );

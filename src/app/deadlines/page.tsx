@@ -5,7 +5,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useKanban } from "@/store/KanbanContext";
 import { Task } from "@/types/kanban";
 import { isTaskOverdue, getTodayIsoString } from "@/lib/utils/taskUtils";
-import { formatDateCompact, formatDateRelative } from "@/lib/utils/dateUtils";
+import { formatDateCompact } from "@/lib/utils/dateUtils";
 import { BlurFade } from "@/components/ui/BlurFade";
 import {
   Calendar as CalendarIcon,
@@ -147,7 +147,6 @@ function DeadlinesContent() {
     const todayStr = getTodayIsoString();
     setHighlightedDay(todayStr);
 
-    // Scroll to today element if available
     const el = document.getElementById(`calendar-day-${todayStr}`);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -158,7 +157,7 @@ function DeadlinesContent() {
   const todayFormatted = formatDateCompact(getTodayIsoString());
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-8">
+    <div className="space-y-6 max-w-7xl mx-auto pb-8 w-full min-w-0 max-w-full overflow-x-hidden">
       {/* Subheader, Mode Switcher & Filters */}
       <BlurFade delay={0.05}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-border/40">
@@ -205,7 +204,7 @@ function DeadlinesContent() {
             <select
               value={projectFilter}
               onChange={(e) => setProjectFilter(e.target.value)}
-              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
+              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple max-w-[150px] sm:max-w-none truncate"
             >
               <option value="all">Все проекты</option>
               {projects.map((p) => (
@@ -218,7 +217,7 @@ function DeadlinesContent() {
             <select
               value={assigneeFilter}
               onChange={(e) => setAssigneeFilter(e.target.value)}
-              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
+              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple max-w-[150px] sm:max-w-none truncate"
             >
               <option value="all">Все исполнители</option>
               {members.map((m) => (
@@ -233,13 +232,13 @@ function DeadlinesContent() {
 
       {/* Mode 1: Timeline (Vertical Rail with Fixed Center Lines & Dots) */}
       {viewMode === "timeline" ? (
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0 max-w-full">
           {periods.map((period, pIdx) => {
             if (period.count === 0) return null;
             const Icon = period.icon;
 
             return (
-              <BlurFade key={period.title} delay={0.1 + pIdx * 0.06} className="space-y-4">
+              <BlurFade key={period.title} delay={0.1 + pIdx * 0.06} className="space-y-4 min-w-0 max-w-full">
                 {/* Section Header */}
                 <div className="flex items-center gap-2">
                   <div
@@ -254,8 +253,8 @@ function DeadlinesContent() {
                   </div>
                 </div>
 
-                {/* Timeline Row List with Exact Centered Line & Bullet Nodes */}
-                <div className="relative space-y-3 pl-1">
+                {/* Timeline Row List */}
+                <div className="relative space-y-3 pl-1 min-w-0 max-w-full">
                   {/* Single Continuous Vertical Connecting Rail Line */}
                   <div className="absolute left-[9px] top-3 bottom-3 w-[2px] bg-border/80 pointer-events-none" />
 
@@ -267,8 +266,8 @@ function DeadlinesContent() {
                     );
 
                     return (
-                      <div key={task.id} className="relative flex items-center gap-3">
-                        {/* Bullet Marker Node (Centered exactly on 2px line) */}
+                      <div key={task.id} className="relative flex items-center gap-3 min-w-0 max-w-full">
+                        {/* Bullet Marker Node */}
                         <div className="relative z-10 flex items-center justify-center shrink-0 w-5">
                           <div
                             className={cn(
@@ -281,7 +280,7 @@ function DeadlinesContent() {
                         {/* Task Card */}
                         <div
                           onClick={() => setSelectedTask(task)}
-                          className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all group"
+                          className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all group min-w-0 max-w-full overflow-hidden"
                         >
                           {/* Title & Info */}
                           <div className="flex items-center gap-3 min-w-0">
@@ -299,9 +298,9 @@ function DeadlinesContent() {
                           </div>
 
                           {/* Status, Date & Assignees */}
-                          <div className="flex items-center gap-4 text-xs shrink-0">
+                          <div className="flex items-center gap-3 sm:gap-4 text-xs shrink-0">
                             {col && (
-                              <span className="font-mono text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-muted-foreground">
+                              <span className="font-mono text-[11px] font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-muted text-muted-foreground">
                                 {col.title}
                               </span>
                             )}
@@ -339,8 +338,8 @@ function DeadlinesContent() {
           })}
         </div>
       ) : (
-        /* Mode 2: Calendar Grid View */
-        <BlurFade delay={0.1} className="space-y-4">
+        /* Mode 2: Calendar Grid View (Scrolled horizontally on small mobile screens) */
+        <BlurFade delay={0.1} className="space-y-4 min-w-0 max-w-full">
           {/* Month Header Navigation */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-card border border-border/60 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center gap-3">
@@ -350,14 +349,14 @@ function DeadlinesContent() {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Explicit Today Button */}
               <button
                 onClick={handleGoToToday}
                 className="flex items-center gap-1.5 rounded-xl border border-ssj-purple/40 bg-ssj-purple/15 px-3 py-1.5 text-xs font-bold text-ssj-purple hover:bg-ssj-purple/25 transition-all shadow-xs"
-                title={`Перейти к сегодняшнему дню (${todayFormatted})`}
+                title={`Перейти к сегодня (${todayFormatted})`}
               >
                 <Target className="h-3.5 w-3.5" />
-                <span>Перейти к сегодня ({todayFormatted})</span>
+                <span className="hidden sm:inline">Перейти к сегодня ({todayFormatted})</span>
+                <span className="sm:hidden">Сегодня ({todayFormatted})</span>
               </button>
 
               <button
@@ -378,91 +377,93 @@ function DeadlinesContent() {
             </div>
           </div>
 
-          {/* Calendar Month Grid */}
-          <div className="rounded-2xl border border-border/60 bg-card/90 overflow-hidden shadow-sm">
-            {/* Days of Week Header */}
-            <div className="grid grid-cols-7 border-b border-border/60 bg-muted/40 text-center font-mono text-xs font-bold text-muted-foreground py-2.5">
-              <span>Пн</span>
-              <span>Вт</span>
-              <span>Ср</span>
-              <span>Чт</span>
-              <span>Пт</span>
-              <span className="text-amber-500">Сб</span>
-              <span className="text-amber-500">Вс</span>
-            </div>
+          {/* Calendar Month Grid Wrapper */}
+          <div className="rounded-2xl border border-border/60 bg-card/90 overflow-x-auto shadow-sm min-w-0 max-w-full">
+            <div className="min-w-[640px]">
+              {/* Days of Week Header */}
+              <div className="grid grid-cols-7 border-b border-border/60 bg-muted/40 text-center font-mono text-xs font-bold text-muted-foreground py-2.5">
+                <span>Пн</span>
+                <span>Вт</span>
+                <span>Ср</span>
+                <span>Чт</span>
+                <span>Пт</span>
+                <span className="text-amber-500">Сб</span>
+                <span className="text-amber-500">Вс</span>
+              </div>
 
-            {/* Month Day Cells */}
-            <div className="grid grid-cols-7 text-xs">
-              {/* Empty offset cells before month start */}
-              {Array.from({ length: startDayOfWeek }).map((_, i) => (
-                <div key={`empty-${i}`} className="min-h-[110px] border-b border-r border-border/30 bg-muted/10 p-2" />
-              ))}
+              {/* Month Day Cells */}
+              <div className="grid grid-cols-7 text-xs">
+                {/* Empty offset cells before month start */}
+                {Array.from({ length: startDayOfWeek }).map((_, i) => (
+                  <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-border/30 bg-muted/10 p-2" />
+                ))}
 
-              {/* Month Days */}
-              {Array.from({ length: daysInMonth }).map((_, i) => {
-                const dayNum = i + 1;
-                const cellDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
-                const dayTasks = filteredTasks.filter((t) => t.dueDate === cellDateStr);
+                {/* Month Days */}
+                {Array.from({ length: daysInMonth }).map((_, i) => {
+                  const dayNum = i + 1;
+                  const cellDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+                  const dayTasks = filteredTasks.filter((t) => t.dueDate === cellDateStr);
 
-                const isToday =
-                  today.getFullYear() === year &&
-                  today.getMonth() === month &&
-                  today.getDate() === dayNum;
+                  const isToday =
+                    today.getFullYear() === year &&
+                    today.getMonth() === month &&
+                    today.getDate() === dayNum;
 
-                const isSelected = highlightedDay === cellDateStr;
+                  const isSelected = highlightedDay === cellDateStr;
 
-                return (
-                  <div
-                    id={`calendar-day-${cellDateStr}`}
-                    key={cellDateStr}
-                    onClick={() => setHighlightedDay(cellDateStr)}
-                    className={cn(
-                      "min-h-[110px] border-b border-r border-border/30 p-2 flex flex-col justify-between transition-all cursor-pointer",
-                      isToday && "bg-ssj-purple/10 font-bold border-ssj-purple/40",
-                      isSelected && "ring-2 ring-ssj-purple shadow-md bg-ssj-purple/15"
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={cn(
-                          "h-6 w-6 rounded-full flex items-center justify-center font-mono text-xs",
-                          isToday
-                            ? "bg-ssj-purple text-white shadow-xs font-bold"
-                            : "text-foreground"
-                        )}
-                      >
-                        {dayNum}
-                      </span>
-                      {dayTasks.length > 0 && (
-                        <span className="font-mono text-[10px] font-bold text-ssj-purple bg-ssj-purple/20 px-1.5 py-0.5 rounded-md border border-ssj-purple/30">
-                          {dayTasks.length} {dayTasks.length === 1 ? "зад." : "зад."}
-                        </span>
+                  return (
+                    <div
+                      id={`calendar-day-${cellDateStr}`}
+                      key={cellDateStr}
+                      onClick={() => setHighlightedDay(cellDateStr)}
+                      className={cn(
+                        "min-h-[100px] border-b border-r border-border/30 p-2 flex flex-col justify-between transition-all cursor-pointer",
+                        isToday && "bg-ssj-purple/10 font-bold border-ssj-purple/40",
+                        isSelected && "ring-2 ring-ssj-purple shadow-md bg-ssj-purple/15"
                       )}
-                    </div>
-
-                    <div className="space-y-1 mt-1 flex-1 overflow-y-auto max-h-[85px]">
-                      {dayTasks.map((t) => (
-                        <div
-                          key={t.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedTask(t);
-                          }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
                           className={cn(
-                            "truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold cursor-pointer border transition-all hover:scale-[1.02]",
-                            isTaskOverdue(t)
-                              ? "bg-destructive/20 text-destructive border-destructive/40"
-                              : "bg-ssj-purple/15 text-ssj-purple border-ssj-purple/30"
+                            "h-6 w-6 rounded-full flex items-center justify-center font-mono text-xs",
+                            isToday
+                              ? "bg-ssj-purple text-white shadow-xs font-bold"
+                              : "text-foreground"
                           )}
-                          title={`${t.id}: ${t.title}`}
                         >
-                          {t.id}
-                        </div>
-                      ))}
+                          {dayNum}
+                        </span>
+                        {dayTasks.length > 0 && (
+                          <span className="font-mono text-[10px] font-bold text-ssj-purple bg-ssj-purple/20 px-1.5 py-0.5 rounded-md border border-ssj-purple/30">
+                            {dayTasks.length}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="space-y-1 mt-1 flex-1 overflow-y-auto max-h-[85px]">
+                        {dayTasks.map((t) => (
+                          <div
+                            key={t.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTask(t);
+                            }}
+                            className={cn(
+                              "truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold cursor-pointer border transition-all hover:scale-[1.02]",
+                              isTaskOverdue(t)
+                                ? "bg-destructive/20 text-destructive border-destructive/40"
+                                : "bg-ssj-purple/15 text-ssj-purple border-ssj-purple/30"
+                            )}
+                            title={`${t.id}: ${t.title}`}
+                          >
+                            {t.id}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </BlurFade>
