@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 0 0% 90.6%;         /* Light theme background: #e7e7e7 */
     --foreground: 0 0% 11.8%;         /* #1e1e1e */
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;                /* Clean white cards over #e7e7e7 background */
     --card-foreground: 0 0% 11.8%;    /* #1e1e1e */
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 11.8%;
@@ -14,8 +14,8 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 95%;
     --secondary-foreground: 0 0% 11.8%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 38%;
+    --muted: 0 0% 86%;
+    --muted-foreground: 0 0% 32%;
     --accent: 0 0% 11.8%;             /* #1e1e1e */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
@@ -27,24 +27,24 @@
   }
 
   .dark {
-    --background: 240 10% 2.2%;       /* Level 0: #050505 */
+    --background: 0 0% 11.8%;         /* Dark theme background: #1e1e1e */
     --foreground: 0 0% 90.6%;         /* #e7e7e7 */
-    --card: 240 4% 6%;                /* Level 1/3: #0F0F10 */
+    --card: 240 4% 8%;                /* #121215 cards over #1e1e1e background */
     --card-foreground: 0 0% 90.6%;     /* #e7e7e7 */
-    --popover: 240 4% 6%;
+    --popover: 240 4% 8%;
     --popover-foreground: 0 0% 90.6%;
     --primary: 248 89% 69%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 8%;           /* Level 2: #121215 */
+    --secondary: 240 4% 12%;          /* #1a1a1e */
     --secondary-foreground: 0 0% 90.6%;
-    --muted: 240 4% 10%;
-    --muted-foreground: 0 0% 64%;
+    --muted: 240 4% 14%;
+    --muted-foreground: 0 0% 68%;
     --accent: 0 0% 90.6%;             /* #e7e7e7 */
     --accent-foreground: 0 0% 5%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90.6% / 0.12;      /* Dark theme border: #e7e7e7 with 12% tech opacity */
-    --input: 0 0% 90.6% / 0.14;       /* Dark theme input border: #e7e7e7 */
+    --border: 0 0% 90.6% / 0.14;      /* Dark theme border: #e7e7e7 with 14% tech opacity */
+    --input: 0 0% 90.6% / 0.16;       /* Dark theme input border: #e7e7e7 */
     --ring: 248 89% 69%;
   }
 }
