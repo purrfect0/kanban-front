@@ -69,7 +69,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
     <div
       ref={setNodeRef}
       className={cn(
-        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-[#0D0D10] p-3 transition-all duration-200 min-h-[calc(100vh-160px)] shadow-sm",
+        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/80 dark:bg-[#0D0D10] p-3 transition-all duration-200 min-h-[calc(100vh-160px)] shadow-sm",
         isCollapsed ? "w-16" : "w-[300px] sm:w-[320px]",
         isOver && columnTheme.drop
       )}
@@ -78,7 +78,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
       <div className={cn("absolute top-0 left-4 right-4 h-[2px] rounded-full", columnTheme.line)} />
 
       {/* Sticky Column Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between pb-3 pt-1 px-1 bg-[#0D0D10]/95 backdrop-blur border-b border-border/40">
+      <div className="sticky top-0 z-10 flex items-center justify-between pb-3 pt-1 px-1 bg-slate-100/95 dark:bg-[#0D0D10]/95 backdrop-blur border-b border-border/40">
         <div className="flex items-center gap-2 overflow-hidden">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}

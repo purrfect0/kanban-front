@@ -70,7 +70,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, members }) => {
       {...listeners}
       onClick={() => setSelectedTask(task)}
       className={cn(
-        "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-gradient-to-b from-[#16161B] to-[#0E0E11] p-3.5 shadow-sm transition-all duration-200 cursor-pointer select-none space-y-3 hover:-translate-y-0.5 hover:shadow-md hover:border-ssj-purple/50",
+        "group relative flex flex-col justify-between rounded-2xl border border-border/60 bg-card dark:bg-gradient-to-b dark:from-[#16161B] dark:to-[#0E0E11] p-3.5 shadow-sm transition-all duration-200 cursor-pointer select-none space-y-3 hover:-translate-y-0.5 hover:shadow-md hover:border-ssj-purple/50",
         isDragging && "opacity-40 scale-95 border-ssj-purple ring-2 ring-ssj-purple/40",
         task.isBlocked && "border-destructive/40 bg-destructive/5"
       )}

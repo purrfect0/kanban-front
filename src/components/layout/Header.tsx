@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCommandPalette }) => {
               className="bg-transparent text-xs sm:text-sm font-semibold text-foreground outline-none cursor-pointer truncate"
             >
               {projects.map((p) => (
-                <option key={p.id} value={p.id}>
+                <option key={p.id} value={p.id} className="bg-white dark:bg-[#141416] text-slate-900 dark:text-slate-100 font-semibold">
                   {p.name}
                 </option>
               ))}

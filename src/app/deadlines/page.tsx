@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useKanban } from "@/store/KanbanContext";
 import { Task } from "@/types/kanban";
-import { isTaskOverdue } from "@/lib/utils/taskUtils";
+import { isTaskOverdue, getTodayIsoString } from "@/lib/utils/taskUtils";
 import { formatDateCompact, formatDateRelative } from "@/lib/utils/dateUtils";
 import { BlurFade } from "@/components/ui/BlurFade";
 import {
@@ -14,8 +14,7 @@ import {
   LayoutList,
   ChevronLeft,
   ChevronRight,
-  ArrowRight,
-  Filter,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +42,7 @@ function DeadlinesContent() {
 
   // Calendar State
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [highlightedDay, setHighlightedDay] = useState<string | null>(getTodayIsoString());
 
   // Filter tasks
   const filteredTasks = tasks.filter((t) => {
@@ -55,7 +55,7 @@ function DeadlinesContent() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Group tasks by period
+  // Group tasks by period for Timeline Mode
   const overdueTasks: Task[] = [];
   const todayTasks: Task[] = [];
   const next7DaysTasks: Task[] = [];
@@ -74,15 +74,12 @@ function DeadlinesContent() {
     const diffTime = due.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    // Completed tasks are not in active overdue
     if (isTaskOverdue(task)) {
       overdueTasks.push(task);
     } else if (diffDays === 0) {
       todayTasks.push(task);
     } else if (diffDays > 0 && diffDays <= 7) {
       next7DaysTasks.push(task);
-    } else if (diffDays > 7) {
-      laterTasks.push(task);
     } else {
       laterTasks.push(task);
     }
@@ -143,9 +140,22 @@ function DeadlinesContent() {
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-  const goToToday = () => setCurrentDate(new Date());
+
+  const handleGoToToday = () => {
+    const now = new Date();
+    setCurrentDate(now);
+    const todayStr = getTodayIsoString();
+    setHighlightedDay(todayStr);
+
+    // Scroll to today element if available
+    const el = document.getElementById(`calendar-day-${todayStr}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
 
   const monthName = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" }).format(currentDate);
+  const todayFormatted = formatDateCompact(getTodayIsoString());
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-8">
@@ -195,7 +205,7 @@ function DeadlinesContent() {
             <select
               value={projectFilter}
               onChange={(e) => setProjectFilter(e.target.value)}
-              className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
+              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
             >
               <option value="all">Все проекты</option>
               {projects.map((p) => (
@@ -208,7 +218,7 @@ function DeadlinesContent() {
             <select
               value={assigneeFilter}
               onChange={(e) => setAssigneeFilter(e.target.value)}
-              className="h-9 rounded-xl border border-border bg-background px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
+              className="h-9 rounded-xl border border-border/80 bg-card px-3 text-xs text-foreground font-semibold outline-none focus:border-ssj-purple"
             >
               <option value="all">Все исполнители</option>
               {members.map((m) => (
@@ -221,7 +231,7 @@ function DeadlinesContent() {
         </div>
       </BlurFade>
 
-      {/* Mode 1: Timeline (Vertical Rail) */}
+      {/* Mode 1: Timeline (Vertical Rail with Fixed Center Lines & Dots) */}
       {viewMode === "timeline" ? (
         <div className="space-y-8">
           {periods.map((period, pIdx) => {
@@ -229,7 +239,8 @@ function DeadlinesContent() {
             const Icon = period.icon;
 
             return (
-              <BlurFade key={period.title} delay={0.1 + pIdx * 0.06} className="space-y-3">
+              <BlurFade key={period.title} delay={0.1 + pIdx * 0.06} className="space-y-4">
+                {/* Section Header */}
                 <div className="flex items-center gap-2">
                   <div
                     className={cn(
@@ -243,8 +254,11 @@ function DeadlinesContent() {
                   </div>
                 </div>
 
-                {/* Vertical Rail List View */}
-                <div className="relative pl-6 space-y-2 border-l-2 border-border/40 ml-3">
+                {/* Timeline Row List with Exact Centered Line & Bullet Nodes */}
+                <div className="relative space-y-3 pl-1">
+                  {/* Single Continuous Vertical Connecting Rail Line */}
+                  <div className="absolute left-[9px] top-3 bottom-3 w-[2px] bg-border/80 pointer-events-none" />
+
                   {period.tasks.map((task) => {
                     const proj = projects.find((p) => p.id === task.projectId);
                     const col = columns.find((c) => c.id === task.columnId);
@@ -253,63 +267,67 @@ function DeadlinesContent() {
                     );
 
                     return (
-                      <div
-                        key={task.id}
-                        onClick={() => setSelectedTask(task)}
-                        className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all group"
-                      >
-                        {/* Status Rail Bullet */}
-                        <div
-                          className={cn(
-                            "absolute -left-[31px] top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full border-2 border-background shadow-xs",
-                            period.rail
-                          )}
-                        />
-
-                        {/* Title & Info */}
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="font-mono font-bold text-xs text-ssj-purple bg-ssj-purple/10 px-2 py-0.5 rounded-lg border border-ssj-purple/20 shrink-0">
-                            {task.id}
-                          </span>
-                          <h4 className="text-xs sm:text-sm font-bold text-foreground truncate group-hover:text-ssj-purple transition-colors">
-                            {task.title}
-                          </h4>
-                          {proj && (
-                            <span className="hidden md:inline text-[11px] text-muted-foreground font-medium truncate">
-                              ({proj.name})
-                            </span>
-                          )}
+                      <div key={task.id} className="relative flex items-center gap-3">
+                        {/* Bullet Marker Node (Centered exactly on 2px line) */}
+                        <div className="relative z-10 flex items-center justify-center shrink-0 w-5">
+                          <div
+                            className={cn(
+                              "h-3.5 w-3.5 rounded-full border-2 border-background shadow-xs",
+                              period.rail
+                            )}
+                          />
                         </div>
 
-                        {/* Status, Date & Assignees */}
-                        <div className="flex items-center gap-4 text-xs shrink-0">
-                          {col && (
-                            <span className="font-mono text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-muted-foreground">
-                              {col.title}
+                        {/* Task Card */}
+                        <div
+                          onClick={() => setSelectedTask(task)}
+                          className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-sm hover:border-ssj-purple/50 cursor-pointer transition-all group"
+                        >
+                          {/* Title & Info */}
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="font-mono font-bold text-xs text-ssj-purple bg-ssj-purple/10 px-2 py-0.5 rounded-lg border border-ssj-purple/20 shrink-0">
+                              {task.id}
                             </span>
-                          )}
+                            <h4 className="text-xs sm:text-sm font-bold text-foreground truncate group-hover:text-ssj-purple transition-colors">
+                              {task.title}
+                            </h4>
+                            {proj && (
+                              <span className="hidden md:inline text-[11px] text-muted-foreground font-medium truncate">
+                                ({proj.name})
+                              </span>
+                            )}
+                          </div>
 
-                          {task.dueDate && (
-                            <span
-                              className={cn(
-                                "font-mono text-xs font-semibold",
-                                period.title === "Просрочено" && "text-destructive font-bold"
-                              )}
-                            >
-                              {formatDateCompact(task.dueDate)}
-                            </span>
-                          )}
+                          {/* Status, Date & Assignees */}
+                          <div className="flex items-center gap-4 text-xs shrink-0">
+                            {col && (
+                              <span className="font-mono text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-muted text-muted-foreground">
+                                {col.title}
+                              </span>
+                            )}
 
-                          <div className="flex items-center -space-x-1">
-                            {assigned.map((m) => (
-                              <div
-                                key={m.id}
-                                className="flex h-6 w-6 items-center justify-center rounded-full bg-ssj-purple/20 text-[10px] font-mono text-ssj-purple border border-card"
-                                title={m.name}
+                            {task.dueDate && (
+                              <span
+                                className={cn(
+                                  "font-mono text-xs font-semibold",
+                                  period.title === "Просрочено" && "text-destructive font-bold"
+                                )}
                               >
-                                {m.avatar}
-                              </div>
-                            ))}
+                                {formatDateCompact(task.dueDate)}
+                              </span>
+                            )}
+
+                            <div className="flex items-center -space-x-1">
+                              {assigned.map((m) => (
+                                <div
+                                  key={m.id}
+                                  className="flex h-6 w-6 items-center justify-center rounded-full bg-ssj-purple/20 text-[10px] font-mono text-ssj-purple border border-card"
+                                  title={m.name}
+                                >
+                                  {m.avatar}
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -324,27 +342,36 @@ function DeadlinesContent() {
         /* Mode 2: Calendar Grid View */
         <BlurFade delay={0.1} className="space-y-4">
           {/* Month Header Navigation */}
-          <div className="flex items-center justify-between bg-card border border-border/60 rounded-2xl p-4 shadow-sm">
-            <h3 className="text-base font-bold text-foreground capitalize font-mono">
-              {monthName}
-            </h3>
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-card border border-border/60 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <h3 className="text-base font-bold text-foreground capitalize font-mono">
+                {monthName}
+              </h3>
+            </div>
 
             <div className="flex items-center gap-2">
+              {/* Explicit Today Button */}
               <button
-                onClick={goToToday}
-                className="rounded-xl border border-border bg-background px-3 py-1.5 text-xs font-bold text-foreground hover:bg-muted transition-colors"
+                onClick={handleGoToToday}
+                className="flex items-center gap-1.5 rounded-xl border border-ssj-purple/40 bg-ssj-purple/15 px-3 py-1.5 text-xs font-bold text-ssj-purple hover:bg-ssj-purple/25 transition-all shadow-xs"
+                title={`Перейти к сегодняшнему дню (${todayFormatted})`}
               >
-                Сегодня
+                <Target className="h-3.5 w-3.5" />
+                <span>Перейти к сегодня ({todayFormatted})</span>
               </button>
+
               <button
                 onClick={prevMonth}
-                className="rounded-xl border border-border bg-background p-2 text-muted-foreground hover:text-foreground"
+                className="rounded-xl border border-border/80 bg-card p-2 text-muted-foreground hover:text-foreground transition-colors"
+                title="Предыдущий месяц"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
+
               <button
                 onClick={nextMonth}
-                className="rounded-xl border border-border bg-background p-2 text-muted-foreground hover:text-foreground"
+                className="rounded-xl border border-border/80 bg-card p-2 text-muted-foreground hover:text-foreground transition-colors"
+                title="Следующий месяц"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -368,7 +395,7 @@ function DeadlinesContent() {
             <div className="grid grid-cols-7 text-xs">
               {/* Empty offset cells before month start */}
               {Array.from({ length: startDayOfWeek }).map((_, i) => (
-                <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-border/30 bg-muted/10 p-2" />
+                <div key={`empty-${i}`} className="min-h-[110px] border-b border-r border-border/30 bg-muted/10 p-2" />
               ))}
 
               {/* Month Days */}
@@ -382,42 +409,52 @@ function DeadlinesContent() {
                   today.getMonth() === month &&
                   today.getDate() === dayNum;
 
+                const isSelected = highlightedDay === cellDateStr;
+
                 return (
                   <div
+                    id={`calendar-day-${cellDateStr}`}
                     key={cellDateStr}
+                    onClick={() => setHighlightedDay(cellDateStr)}
                     className={cn(
-                      "min-h-[100px] border-b border-r border-border/30 p-2 flex flex-col justify-between transition-colors hover:bg-muted/20",
-                      isToday && "bg-ssj-purple/5 font-bold"
+                      "min-h-[110px] border-b border-r border-border/30 p-2 flex flex-col justify-between transition-all cursor-pointer",
+                      isToday && "bg-ssj-purple/10 font-bold border-ssj-purple/40",
+                      isSelected && "ring-2 ring-ssj-purple shadow-md bg-ssj-purple/15"
                     )}
                   >
                     <div className="flex items-center justify-between">
                       <span
                         className={cn(
                           "h-6 w-6 rounded-full flex items-center justify-center font-mono text-xs",
-                          isToday && "bg-ssj-purple text-white shadow-xs"
+                          isToday
+                            ? "bg-ssj-purple text-white shadow-xs font-bold"
+                            : "text-foreground"
                         )}
                       >
                         {dayNum}
                       </span>
                       {dayTasks.length > 0 && (
-                        <span className="font-mono text-[10px] font-bold text-ssj-purple bg-ssj-purple/15 px-1.5 py-0.5 rounded">
-                          {dayTasks.length}
+                        <span className="font-mono text-[10px] font-bold text-ssj-purple bg-ssj-purple/20 px-1.5 py-0.5 rounded-md border border-ssj-purple/30">
+                          {dayTasks.length} {dayTasks.length === 1 ? "зад." : "зад."}
                         </span>
                       )}
                     </div>
 
-                    <div className="space-y-1 mt-1 flex-1 overflow-y-auto max-h-[80px]">
+                    <div className="space-y-1 mt-1 flex-1 overflow-y-auto max-h-[85px]">
                       {dayTasks.map((t) => (
                         <div
                           key={t.id}
-                          onClick={() => setSelectedTask(t)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTask(t);
+                          }}
                           className={cn(
-                            "truncate rounded px-1.5 py-0.5 text-[10px] font-semibold cursor-pointer border",
+                            "truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold cursor-pointer border transition-all hover:scale-[1.02]",
                             isTaskOverdue(t)
                               ? "bg-destructive/20 text-destructive border-destructive/40"
                               : "bg-ssj-purple/15 text-ssj-purple border-ssj-purple/30"
                           )}
-                          title={t.title}
+                          title={`${t.id}: ${t.title}`}
                         >
                           {t.id}
                         </div>

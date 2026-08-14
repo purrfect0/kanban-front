@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 240 10% 98%;
     --foreground: 240 10% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 4.1%;
@@ -20,8 +20,8 @@
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+    --border: 240 5.9% 88%;
+    --input: 240 5.9% 88%;
     --ring: 248 89% 69%;
     --radius: 0.75rem;
   }
@@ -55,6 +55,16 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-ssj-purple/20 selection:text-ssj-purple;
+  }
+
+  select option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+
+  .dark select option {
+    background-color: #141416;
+    color: #f4f4f5;
   }
 }
 

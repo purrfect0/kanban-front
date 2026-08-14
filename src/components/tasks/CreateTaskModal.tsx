@@ -127,7 +127,7 @@ export const CreateTaskModal: React.FC = () => {
                 className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={p.id} className="bg-white dark:bg-[#141416] text-slate-900 dark:text-slate-100">
                     {p.name}
                   </option>
                 ))}
@@ -144,7 +144,7 @@ export const CreateTaskModal: React.FC = () => {
                 className="w-full h-10 rounded-xl border border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-[#141416] px-3 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-ssj-purple transition-all"
               >
                 {columns.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c.id} value={c.id} className="bg-white dark:bg-[#141416] text-slate-900 dark:text-slate-100">
                     {c.title}
                   </option>
                 ))}
