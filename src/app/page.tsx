@@ -141,7 +141,7 @@ function OverviewContent() {
         </BlurFade>
       </div>
 
-      {/* Active Projects Grid (Unified Single Cards with Dividers) */}
+      {/* Active Projects Grid (Unified Single Cards with Custom Spacing & Dividers) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">Проекты команды</h2>
@@ -153,9 +153,9 @@ function OverviewContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project, idx) => (
             <BlurFade key={project.id} delay={0.2 + idx * 0.05}>
-              <MagicCard className="p-5 space-y-4">
+              <MagicCard className="p-5">
                 {/* Upper Section: Project Title, Type Badge, Description & Navigation Arrow */}
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-bold text-foreground">{project.name}</h3>
@@ -163,7 +163,7 @@ function OverviewContent() {
                         {project.type === "website" ? "Сайт" : "Telegram-бот"}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
                       {project.description}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ function OverviewContent() {
                 </div>
 
                 {/* Clean Horizontal Dividing Line */}
-                <div className="border-t border-border/40 pt-4">
+                <div className="border-t border-border/40 pt-2.5">
                   {/* Embedded Project Pulse Telemetry Panel */}
                   <ProjectPulse project={project} tasks={tasks} hideCardWrapper />
                 </div>

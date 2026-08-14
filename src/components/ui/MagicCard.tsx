@@ -37,20 +37,23 @@ export const MagicCard: React.FC<MagicCardProps> = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:border-ssj-purple/40 hover:shadow-lg hover:shadow-ssj-purple/5 group",
+        "relative overflow-hidden rounded-2xl border border-border/80 bg-card p-5 transition-colors duration-200 hover:border-ssj-purple/40 hover:shadow-lg hover:shadow-ssj-purple/5 group",
         className
       )}
       {...props}
     >
-      {/* Dynamic Cursor Spotlight Effect */}
-      {position && (
-        <div
-          className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100"
-          style={{
-            background: `radial-gradient(${gradientSize}px circle at ${position.x}px ${position.y}px, ${gradientColor}, transparent 80%)`,
-          }}
-        />
-      )}
+      {/* Permanent Cursor Spotlight Overlay (Opacity Toggled to Prevent Layout Shift) */}
+      <div
+        className={cn(
+          "pointer-events-none absolute -inset-px transition-opacity duration-300",
+          position ? "opacity-100" : "opacity-0"
+        )}
+        style={{
+          background: position
+            ? `radial-gradient(${gradientSize}px circle at ${position.x}px ${position.y}px, ${gradientColor}, transparent 80%)`
+            : undefined,
+        }}
+      />
       <div className="relative z-10">{children}</div>
     </div>
   );
