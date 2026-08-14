@@ -7,7 +7,7 @@ import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import { useKanban } from "@/store/KanbanContext";
 import { ProjectPulse } from "@/components/ui/ProjectPulse";
 import { BlurFade } from "@/components/ui/BlurFade";
-import { SlidersHorizontal, X, Filter } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function BoardPage() {
   return (
@@ -52,9 +52,9 @@ function BoardContent() {
 
   return (
     <div className="space-y-4">
-      {/* Active Project Subheader & Project Pulse Telemetry Bar */}
-      <BlurFade delay={0.05} className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-border/40">
+      {/* Sticky Active Project Subheader & Project Pulse Telemetry Bar */}
+      <BlurFade delay={0.05} className="sticky top-16 z-20 bg-slate-50/90 dark:bg-[#050505]/90 backdrop-blur-md pb-3 pt-1 border-b border-border/40 space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <span>{activeProject ? activeProject.name : "Все проекты"}</span>
@@ -111,9 +111,9 @@ function BoardContent() {
           </div>
         </div>
 
-        {/* Render Project Pulse Telemetry Panel if active project exists */}
+        {/* Render Project Pulse Telemetry Panel in Compact mode when pinned */}
         {activeProject && (
-          <ProjectPulse project={activeProject} tasks={tasks} />
+          <ProjectPulse project={activeProject} tasks={tasks} compact />
         )}
       </BlurFade>
 

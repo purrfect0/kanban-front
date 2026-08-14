@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Plus, ChevronDown, ChevronRight, AlertCircle, Sparkles } from "lucide-react";
+import { Plus, ChevronDown, ChevronRight, AlertCircle } from "lucide-react";
 import { Column, Task, Member } from "@/types/kanban";
 import { TaskCard } from "./TaskCard";
 import { BlurFade } from "@/components/ui/BlurFade";
@@ -53,7 +53,7 @@ const COLUMN_STATUS_THEMES: Record<
 };
 
 export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, members }) => {
-  const { setIsCreateTaskOpen, showToast } = useKanban();
+  const { setIsCreateTaskOpen } = useKanban();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const { setNodeRef, isOver } = useDroppable({
@@ -69,7 +69,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
     <div
       ref={setNodeRef}
       className={cn(
-        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/80 dark:bg-[#0D0D10] p-3 transition-all duration-200 min-h-[calc(100vh-160px)] shadow-sm",
+        "relative flex flex-col shrink-0 rounded-2xl border border-border/60 bg-slate-100/80 dark:bg-[#0D0D10] p-3 transition-all duration-200 h-fit max-h-[calc(100vh-220px)] shadow-sm",
         isCollapsed ? "w-16" : "w-[300px] sm:w-[320px]",
         isOver && columnTheme.drop
       )}
@@ -154,7 +154,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
           items={tasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="flex-1 space-y-3 overflow-y-auto pt-3 pr-0.5 min-h-[200px]">
+          <div className="flex-1 space-y-3 overflow-y-auto pt-3 pr-0.5 max-h-[calc(100vh-280px)]">
             {tasks.map((task, idx) => (
               <BlurFade key={task.id} delay={0.05 + idx * 0.03}>
                 <TaskCard task={task} members={members} />
@@ -162,7 +162,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks, membe
             ))}
 
             {tasks.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-12 rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground space-y-2">
+              <div className="flex flex-col items-center justify-center py-8 rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground space-y-2">
                 <p>Колонка пуста</p>
                 <button
                   onClick={() => setIsCreateTaskOpen(true)}
